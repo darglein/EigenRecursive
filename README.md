@@ -8,7 +8,7 @@ Features
  * A recursive LDLT decomposition, based on Eigen's simplicial implemenation
  * Mixed matrix types and mixed recursive solvers for structured optimization problems
  
- <img src="doc/1.png" width="425"/> <img src="doc/2.jpg" width="425"/> 
+ <img src="doc/1.png" width="425"/> <img src="doc/2.png" width="425"/> 
  
 ## Usage
 	
