@@ -46,7 +46,7 @@ The benchmarks and examples for non-linear least squares optimzation are current
 
 This project contains (modified) code from the Eigen library. You can find the Eigen license [here](http://eigen.tuxfamily.org/index.php?title=Main_Page#License).
 
-All of our code is und the MIT License. See the LICENSE file for more information.
+All of our code is under the MIT License. See the LICENSE file for more information.
 
 Copyright (c) 2019 Darius Rückert <darius.rueckert@fau.de>
 
