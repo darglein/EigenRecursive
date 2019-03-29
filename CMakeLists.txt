@@ -26,7 +26,7 @@ PackageHelperTarget(Eigen3::Eigen EIGEN3_FOUND)
 
 include_directories(include/)
 
-add_subdirectory(include/EigenRecursive)
+add_subdirectory(include/)
 add_subdirectory(samples)
 
 

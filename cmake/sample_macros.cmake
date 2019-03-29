@@ -18,11 +18,10 @@ macro(make_sample)
     FILE(GLOB main_HEADER2  *.hpp)
     SET(PROG_SRC ${main_SRC} ${cuda_SRC} ${main_HEADER} ${main_HEADER2})
 
-    include_directories(.)
 
     add_executable(${PROG_NAME} ${PROG_SRC} )
 
-    target_link_libraries(${PROG_NAME} ${LIBS} ${LIB_TARGETS})
+    target_link_libraries(${PROG_NAME} ${LIB_NAME})
     # We only need to link the saiga target
     #message(STATUS "${${_modules}}")
     #target_link_libraries(${PROG_NAME} ${${_modules}})
