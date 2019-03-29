@@ -1,6 +1,6 @@
-# Eigen Recursive Matrix Extension
+# Eigen Recursive Matrix Extension (ERME)
 
-This is an extension to the [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) math library for recursive linear algebra.
+ERME is an extension to the [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) math library for recursive linear algebra. 
 
 Features
  * Template specializations to allow the creation and usage of recursive matrix types
