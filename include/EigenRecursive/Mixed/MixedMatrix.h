@@ -32,6 +32,14 @@ struct SymmetricMixedMatrix22
     VType v;
     WType w;
     WTType wt;
+
+    void resize(int n, int m)
+    {
+        u.resize(n);
+        v.resize(m);
+        w.resize(n, m);
+        wt.resize(m, n);
+    }
 };
 
 template <typename U, typename V, typename W>
@@ -44,6 +52,13 @@ struct SymmetricMixedMatrix2
     UType u;
     VType v;
     WType w;
+
+    void resize(int n, int m)
+    {
+        u.resize(n);
+        v.resize(m);
+        w.resize(n, m);
+    }
 };
 
 

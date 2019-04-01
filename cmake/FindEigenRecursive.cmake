@@ -14,4 +14,11 @@ find_path(EIGENRECURSIVE_INCLUDE_DIRS
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(EigenRecursive DEFAULT_MSG EIGENRECURSIVE_INCLUDE_DIRS)
 
+
+add_library(EigenRecursive SHARED IMPORTED)
+set_target_properties(EigenRecursive PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${EIGENRECURSIVE_INCLUDE_DIRS}"
+)
+
+
 mark_as_advanced(EIGENRECURSIVE_INCLUDE_DIRS)
