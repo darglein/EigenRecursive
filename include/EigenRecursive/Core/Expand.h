@@ -296,3 +296,15 @@ struct ScalarType<MatrixScalar<G>>
 
 
 }  // namespace Eigen::Recursive
+
+
+namespace Eigen
+{
+template <typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+std::ostream& operator<<(
+    std::ostream& strm, const Matrix<Recursive::MatrixScalar<_Scalar>, _Rows, _Cols, _Options, _MaxRows, _MaxCols>& rhs)
+{
+    strm << expand(rhs) << std::endl;
+    return strm;
+}
+}  // namespace Eigen
