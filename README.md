@@ -12,26 +12,25 @@ Features
  
 ## Usage
 	
-	// See samples/helloRecursive for the full example
-    #include "EigenRecursive/All.h"
-    int main(int, char**)
-    {
-        using namespace Eigen;
-		using namespace Eigen::Recursive;
+        // See samples/helloRecursive for the full example
+        #include "EigenRecursive/All.h"
+        int main(int, char**)
+        {
+             using namespace Eigen;
+             using namespace Eigen::Recursive;
 
-        using Block          = Matrix<double, 2, 2>;
-        using MatrixOfMatrix = Matrix<MatrixScalar<Block>, 2, 2>;
+             using Block          = Matrix<double, 2, 2>;
+             using MatrixOfMatrix = Matrix<MatrixScalar<Block>, 2, 2>;
 
-        MatrixOfMatrix A, B, C;
+             MatrixOfMatrix A, B, C;
+             setRandom(A);
+             setRandom(B);
 
-        A = RecursiveRandom<MatrixOfMatrix>::get();
-        B = RecursiveRandom<MatrixOfMatrix>::get();
+             C = A * B;
 
-        C = A * B;
-
-        std::cout << expand(C) << std::endl;
-        return 0;
-    }
+             std::cout << C << std::endl;
+             return 0;
+        }
     
 ## Benchmark and Optimization Samples
 

@@ -17,18 +17,19 @@ int main(int, char**)
 
     MatrixOfMatrix A, B, C;
 
-    A = RecursiveRandom<MatrixOfMatrix>::get();
-    B = RecursiveRandom<MatrixOfMatrix>::get();
+    setRandom(A);
+    setRandom(B);
 
     C = A * B;
 
-    std::cout << "A" << std::endl << expand(A) << std::endl << std::endl;
-    std::cout << "B" << std::endl << expand(B) << std::endl << std::endl;
-    std::cout << "C = A * B" << std::endl << expand(C) << std::endl << std::endl;
+    std::cout << "A" << std::endl << A << std::endl << std::endl;
+    std::cout << "B" << std::endl << B << std::endl << std::endl;
+    std::cout << "C = A * B" << std::endl << C << std::endl << std::endl;
 
     auto ref   = (expand(A) * expand(B)).eval();
-    auto error = (ref - expand(C)).norm();
-    // Might be larger than 0, because of different order of floating point operations
+    auto error = (ref - expand(C)).squaredNorm();
+    // Might be larger than 0, because of different order of floating point
+    // operations
     std::cout << "Error to non-recursive implementation: " << error << std::endl;
     return 0;
 }
