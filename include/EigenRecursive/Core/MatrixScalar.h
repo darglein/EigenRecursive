@@ -102,7 +102,11 @@ struct MatrixScalar
     // This constructor may seem a bit strange, but assigning anything different from a zero to a matrix is not well
     // defined. We also can't remove this constructor because some eigen functions use Scalar(0). Therefore we need
     // a constructor from a single (actual) scalar value.
-    EIGEN_ALWAYS_INLINE MatrixScalar(Scalar v) { data.setZero(); }
+    EIGEN_ALWAYS_INLINE MatrixScalar(Scalar v)
+    {
+        data.setZero();
+        data.setConstant(v);
+    }
     //    EIGEN_ALWAYS_INLINE MatrixScalar(int v) { data.setZero(); }
 
     EIGEN_ALWAYS_INLINE MatrixScalar(const MatrixType& v) : data(v) {}

@@ -1,6 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 set(LIB_NAME EigenRecursive)
+set(EXPORT_NAME EigenRecursiveExport)
 
 project (${LIB_NAME} CXX)
 

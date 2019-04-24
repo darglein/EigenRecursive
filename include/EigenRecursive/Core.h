@@ -9,6 +9,7 @@
 #pragma once
 
 
+#include "Core/DenseMV.h"
 #include "Core/Dot.h"
 #include "Core/Expand.h"
 #include "Core/ForwardBackwardSubs.h"

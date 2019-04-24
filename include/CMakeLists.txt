@@ -18,12 +18,14 @@ target_include_directories(
 
 install(
     TARGETS ${LIB_NAME}
-    EXPORT ${LIB_NAME}
+    EXPORT ${EXPORT_NAME}
     DESTINATION "."
     )
 
 install(
-    EXPORT ${LIB_NAME}
+    EXPORT ${EXPORT_NAME}
+    FILE EigenRecursiveTargets.cmake
+    NAMESPACE Eigen::
     DESTINATION "share/EigenRecursive"
     )
 

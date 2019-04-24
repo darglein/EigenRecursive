@@ -8,6 +8,7 @@
 #include "EigenRecursive/All.h"
 
 
+
 using std::cout;
 using std::endl;
 
@@ -70,8 +71,8 @@ class DenseTest
         RV2 = expand(RV);
         LV2 = expand(LV);
 
-        add();
-        scalar();
+        //        add();
+        //        scalar();
         mult();
 
         cout << "Done." << endl << endl;
@@ -122,34 +123,42 @@ class DenseTest
     void mult() const
     {
         //        Eigen::internal::scaleAndAddTo();
-        // Matrix-Matrix
-        Result1 resLR = L * R;
-        Result2 resRL = R * L;
+
         // Matrix-Vector
-        LHSV resLV = L * RV;
-        RHSV resRV = R * LV;
-
-        // Complex expression
+        LHSV resLV        = L * RV;
+        RHSV resRV        = R * -LV;
         LHSV resExpr_easy = L * (R * LV);
-        RHSV resExpr_hard = R * ((L * R) * LV);
 
+        // Matrix-Vector
+        ExpandedType resLV2        = L2 * RV2;
+        ExpandedType resRV2        = R2 * -LV2;
+        ExpandedType resExpr_easy2 = L2 * (R2 * LV2);
+
+        cout << "Mat-Vec 1 - Error: " << (expand(resLV) - resLV2).squaredNorm() << endl;
+        cout << "Mat-Vec 2 - Error: " << (expand(resRV) - resRV2).squaredNorm() << endl;
+        cout << "Expression - Error: " << (expand(resExpr_easy) - resExpr_easy2).squaredNorm() << endl;
+
+
+        // Dynamic Matrix-Matrix multiplication currently does not work
+        if constexpr (fixedSize)
         {
-            // ==== Correctness check
-            ExpandedType resLR2 = L2 * R2;
-            ExpandedType resRL2 = R2 * L2;
-            // Matrix-Vector
-            ExpandedType resLV2 = L2 * RV2;
-            ExpandedType resRV2 = R2 * LV2;
+            Result1 resLR = L * R;
+            Result2 resRL = R * L;
 
-            ExpandedType resExpr_easy2 = L2 * (R2 * LV2);
-            ExpandedType resExpr_hard2 = R2 * ((L2 * R2) * LV2);
+            // Complex expression
+            RHSV resExpr_hard = R * ((L * R) * LV);
 
-            cout << "Mat-Mat 1 - Error: " << (expand(resLR) - resLR2).squaredNorm() << endl;
-            cout << "Mat-Mat 2 - Error: " << (expand(resRL) - resRL2).squaredNorm() << endl;
-            cout << "Mat-Vec 1 - Error: " << (expand(resLV) - resLV2).squaredNorm() << endl;
-            cout << "Mat-Vec 2 - Error: " << (expand(resRV) - resRV2).squaredNorm() << endl;
-            cout << "Expression - Error: " << (expand(resExpr_easy) - resExpr_easy2).squaredNorm() << endl;
-            cout << "Expression - Error: " << (expand(resExpr_hard) - resExpr_hard2).squaredNorm() << endl;
+            {
+                // ==== Correctness check
+                ExpandedType resLR2 = L2 * R2;
+                ExpandedType resRL2 = R2 * L2;
+
+                ExpandedType resExpr_hard2 = R2 * ((L2 * R2) * LV2);
+
+                cout << "Mat-Mat 1 - Error: " << (expand(resLR) - resLR2).squaredNorm() << endl;
+                cout << "Mat-Mat 2 - Error: " << (expand(resRL) - resRL2).squaredNorm() << endl;
+                cout << "Expression - Error: " << (expand(resExpr_hard) - resExpr_hard2).squaredNorm() << endl;
+            }
         }
     }
 
@@ -172,11 +181,7 @@ int main(int, char**)
     Eigen::Recursive::DenseTest<3, 2, 4, 5> test_rect;
     Eigen::Recursive::DenseTest<3, 3, 5, 5> test_square;
 
-    // Dense dynamic currently does not work for rectangular blocks, because
-    // the product maps to
-    // Derived::scaleAndAddTo(dst,lhs,rhs,Scalar(1));
-    // and Scalar(1) is undefined in this case.
-    //    Eigen::Recursive::DenseTest<3, 2, 4, 5, false> test_rect_dyanmic;
-    //    Eigen::Recursive::DenseTest<3, 3, 5, 5, false> test_square_dynamic;
+    Eigen::Recursive::DenseTest<3, 2, 4, 5, false> test_rect_dyanmic;
+    Eigen::Recursive::DenseTest<3, 3, 5, 5, false> test_square_dynamic;
     return 0;
 }
