@@ -8,8 +8,8 @@ Features
  * A recursive LDLT decomposition, based on Eigen's simplicial implemenation
  * Mixed matrix types and mixed recursive solvers for structured optimization problems
  
- <img src="doc/1.png" width="425"/> <img src="doc/2.png" width="425"/> 
- 
+ <img src="data/1.png" width="425"/> <img src="data/2.png" width="425"/> 
+  <img src="data/ba_table.png" width="800"/>
 ## Usage
 	
         // See samples/helloRecursive for the full example
@@ -32,11 +32,11 @@ Features
              return 0;
         }
     
-## Non-linear Optimization
+## Optimization and Benchmarks
 
-To build the bundle adjustment sample you need the [Sophus](https://github.com/strasdat/Sophus) library installed. The other optimization samples as well as the benchamrks are currently part of the [Saiga](https://github.com/darglein/saiga) library.
+To build the bundle adjustment sample you need the [Sophus](https://github.com/strasdat/Sophus) library installed. The other optimization samples as well as the benchmarks are currently part of the [Saiga](https://github.com/darglein/saiga) library.
 
- * [Bundle Adjustment (included here)](https://github.com/darglein/saiga/blob/master/src/saiga/vision/ba/BARecursive.h)
+ * [Bundle Adjustment (included here)](https://github.com/darglein/EigenRecursive/tree/master/samples/bundleAdjustment)
  * [Benchmark - Matrix-Matrix, Matrix-Vector - MKL](https://github.com/darglein/saiga/tree/master/samples/vision/mkl_test)
  * [Benchmark - LDLT - Cholmod](https://github.com/darglein/saiga/tree/master/samples/vision/sparse_ldlt)
  * [Pose Graph Optimization](https://github.com/darglein/saiga/blob/master/src/saiga/vision/pgo/PGORecursive.h)
