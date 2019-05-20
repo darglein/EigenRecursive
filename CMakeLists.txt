@@ -18,6 +18,7 @@ DefaultBuildType(RelWithDebInfo)
 
 
 
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0")
 
 ############# Required LIBRARIES ###############
@@ -27,6 +28,10 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0")
 find_package(Eigen3 REQUIRED)
 PackageHelperTarget(Eigen3::Eigen EIGEN3_FOUND)
 
+
+#eigen
+find_package(Sophus QUIET)
+PackageHelperTarget(Sophus::Sophus SOPHUS_FOUND)
 
 
 include_directories(include/)

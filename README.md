@@ -32,14 +32,15 @@ Features
              return 0;
         }
     
-## Benchmark and Optimization Samples
+## Non-linear Optimization
 
-The benchmarks and examples for non-linear least squares optimzation are currently part of the [Saiga](https://github.com/darglein/saiga) library. 
+To build the bundle adjustment sample you need the [Sophus](https://github.com/strasdat/Sophus) library installed. The other optimization samples as well as the benchamrks are currently part of the [Saiga](https://github.com/darglein/saiga) library.
 
+ * [Bundle Adjustment (included here)](https://github.com/darglein/saiga/blob/master/src/saiga/vision/ba/BARecursive.h)
  * [Benchmark - Matrix-Matrix, Matrix-Vector - MKL](https://github.com/darglein/saiga/tree/master/samples/vision/mkl_test)
  * [Benchmark - LDLT - Cholmod](https://github.com/darglein/saiga/tree/master/samples/vision/sparse_ldlt)
- * [Bundle Adjustment](https://github.com/darglein/saiga/blob/master/src/saiga/vision/ba/BARecursive.h)
  * [Pose Graph Optimization](https://github.com/darglein/saiga/blob/master/src/saiga/vision/pgo/PGORecursive.h)
+  * [ARAP](https://github.com/darglein/saiga/blob/master/src/saiga/vision/arap/RecursiveArap.h)
 	
 ## License
 

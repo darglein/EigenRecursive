@@ -47,12 +47,14 @@ class MixedSymmetricRecursiveSolver<
     using XUType = typename XType::UType;
     using XVType = typename XType::VType;
 
-    using SType = Eigen::SparseMatrix<UBlock, Eigen::RowMajor>;
+    using S1Type = Eigen::SparseMatrix<UBlock, Eigen::RowMajor>;
+    using S2Type = Eigen::SparseMatrix<VBlock, Eigen::RowMajor>;
 
-    using LDLT = Eigen::RecursiveSimplicialLDLT<SType, Eigen::Upper>;
+    using LDLT = Eigen::RecursiveSimplicialLDLT<S1Type, Eigen::Upper>;
 
 
-    using InnerSolver = MixedSymmetricRecursiveSolver<SType, XUType>;
+    using InnerSolver1 = MixedSymmetricRecursiveSolver<S1Type, XUType>;
+    using InnerSolver2 = MixedSymmetricRecursiveSolver<S2Type, XVType>;
 
     void analyzePattern(const AType& A, const LinearSolverOptions& solverOptions)
     {
@@ -64,7 +66,7 @@ class MixedSymmetricRecursiveSolver<
         Sdiag.resize(n);
         ej.resize(n);
         q.resize(m);
-        S.resize(n, n);
+        S1.resize(n, n);
 
 
         if (solverOptions.solverType == LinearSolverOptions::SolverType::Direct)
@@ -105,34 +107,19 @@ class MixedSymmetricRecursiveSolver<
         if (hasWT)
         {
             transposeValueOnly(A.w, WT);
-            //            transpose(A.w, WT);
-            //            cout << expand(A.w) << endl << endl;
-            //            cout << expand(WT) << endl << endl;
-            //            cout << A.w.rows() << "x" << A.w.cols() << endl;
-            //            cout << WT.rows() << "x" << WT.cols() << endl;
         }
 
-
-
-        // compute schur
+#if 1
+        // U schur (S1)
         for (int i = 0; i < m; ++i) Vinv.diagonal()(i) = V.diagonal()(i).get().inverse();
         Y = multSparseDiag(W, Vinv);
-
-        //        cout << "Vinv" << endl << expand(Vinv) << endl << endl;
-        //        cout << "Y" << endl << expand(Y) << endl << endl;
 
         if (explizitSchur)
         {
             eigen_assert(hasWT);
-            // (S is symmetric)
-            S = (Y * WT).template triangularView<Eigen::Upper>();
-            //            S            = (Y * WT);
-            S            = -S;
-            S.diagonal() = U.diagonal() + S.diagonal();
-            //            cout << "S" << endl << expand(S) << endl << endl;
-
-            //            double S_density = S.nonZeros() / double(S.rows() * S.cols());
-            //            cout << "S density: " << S_density << endl;
+            S1            = (Y * WT).template triangularView<Eigen::Upper>();
+            S1            = -S1;
+            S1.diagonal() = U.diagonal() + S1.diagonal();
         }
         else
         {
@@ -140,7 +127,6 @@ class MixedSymmetricRecursiveSolver<
             Sdiag.diagonal() = U.diagonal() - Sdiag.diagonal();
         }
         ej = ea + -(Y * eb);
-        //        cout << "ej" << endl << expand(ej) << endl << endl;
 
         if (solverOptions.solverType == LinearSolverOptions::SolverType::Iterative && !explizitSchur)
         {
@@ -173,7 +159,7 @@ class MixedSymmetricRecursiveSolver<
         }
         else
         {
-            solver.solve(S, da, ej, solverOptions);
+            solver1.solve(S1, da, ej, solverOptions);
         }
 
         // finalize
@@ -187,6 +173,11 @@ class MixedSymmetricRecursiveSolver<
         }
         q  = eb - q;
         db = multDiagVector(Vinv, q);
+#else
+        // V schur (S1)
+        for (int i = 0; i < m; ++i) Vinv.diagonal()(i) = V.diagonal()(i).get().inverse();
+        Y = multSparseDiag(W, Vinv);
+#endif
     }
 
    private:
@@ -196,13 +187,14 @@ class MixedSymmetricRecursiveSolver<
     XVType q;
     AVType Vinv;
     AWType Y;
-    SType S;
+    S1Type S1;
     Eigen::DiagonalMatrix<UBlock, -1> Sdiag;
     XUType ej;
 
     AWTType WT;
 
-    InnerSolver solver;
+    InnerSolver1 solver1;
+    InnerSolver2 solver2;
 
     bool patternAnalyzed = false;
     bool hasWT           = true;
