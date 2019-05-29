@@ -26,7 +26,7 @@ class SparseTest
     using RHSVector    = Matrix<double, m, 1>;
 
 
-    // Fixed sized outer matrices
+    // Outer matrices
     using LHS     = SparseMatrix<MatrixScalar<LHSBlock>>;
     using RHS     = SparseMatrix<MatrixScalar<RHSBlock>>;
     using RHSV    = Matrix<MatrixScalar<RHSVector>, -1, 1>;
