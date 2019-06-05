@@ -167,7 +167,7 @@ struct InverseCholeskyImpl<double>
 template <>
 struct InverseCholeskyImpl<float>
 {
-    static float get(float d) { return 1.0 / d; }
+    static float get(float d) { return 1.0f / d; }
 };
 
 #if 1

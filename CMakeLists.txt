@@ -17,10 +17,10 @@ DefaultBuildType(RelWithDebInfo)
 
 
 
-
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0")
-
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+else()
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0")
+endif()
 ############# Required LIBRARIES ###############
 
 

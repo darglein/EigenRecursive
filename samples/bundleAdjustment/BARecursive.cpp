@@ -11,7 +11,7 @@
 #include <numeric>
 
 template <typename _InputIterator1, typename _InputIterator2, typename _Tp>
-inline _Tp exclusive_scan(_InputIterator1 __first1, _InputIterator1 __last1, _InputIterator2 __output, _Tp __init)
+inline _Tp exclusive_scan_(_InputIterator1 __first1, _InputIterator1 __last1, _InputIterator2 __output, _Tp __init)
 {
     for (; __first1 != __last1; ++__first1, (void)++__output)
     {
@@ -156,8 +156,8 @@ void BARec::init()
         }
     }
 
-    auto test1 = exclusive_scan(cameraPointCounts.begin(), cameraPointCounts.end(), cameraPointCountsScan.begin(), 0);
-    auto test2 = exclusive_scan(pointCameraCounts.begin(), pointCameraCounts.end(), pointCameraCountsScan.begin(), 0);
+    auto test1 = exclusive_scan_(cameraPointCounts.begin(), cameraPointCounts.end(), cameraPointCountsScan.begin(), 0);
+    auto test2 = exclusive_scan_(pointCameraCounts.begin(), pointCameraCounts.end(), pointCameraCountsScan.begin(), 0);
 
     assert(test1 == observations && test2 == observations);
 
