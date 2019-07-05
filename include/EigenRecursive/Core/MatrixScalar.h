@@ -102,10 +102,10 @@ struct MatrixScalar
     // This constructor may seem a bit strange, but assigning anything different from a zero to a matrix is not well
     // defined. We also can't remove this constructor because some eigen functions use Scalar(0). Therefore we need
     // a constructor from a single (actual) scalar value.
-    EIGEN_ALWAYS_INLINE MatrixScalar(Scalar v)
+    EIGEN_ALWAYS_INLINE MatrixScalar(BaseScalarType v)
     {
         data.setZero();
-        data.setConstant(v);
+        //        data.setConstant(v);
     }
     //    EIGEN_ALWAYS_INLINE MatrixScalar(int v) { data.setZero(); }
 
@@ -137,7 +137,7 @@ struct MatrixScalar
     EIGEN_ALWAYS_INLINE ScalarType operator*(const ScalarType& other) const { return {data * other.data}; }
     //    ScalarType operator-(const ScalarType& other) const
     //    {
-    //        cout << "-2" << endl;
+    //        std::cout << "-2" << std::endl;
     //        return {data - other.data};
     //    }
 

@@ -68,7 +68,7 @@ void solveTriangularForwardLeftLowerCol(const Lhs& lhs, const LhsDiag& lhsDiag, 
     }
 
 #if 0
-    cout << cpy.rows() << "x" << cpy.cols() << endl;
+    std::cout << cpy.rows() << "x" << cpy.cols() << std::endl;
     // Test if (Ax-b)==0
     auto lcpy       = lhs.toDense().eval();
     lcpy.diagonal() = lhsDiag;
@@ -81,11 +81,11 @@ void solveTriangularForwardLeftLowerCol(const Lhs& lhs, const LhsDiag& lhsDiag, 
     auto cpyE   = expand(cpy);
 
 
-    //    cout << lcpyE << endl << endl;
-    //    cout << "result: " << otherE.transpose() << endl;
+    //    std::cout << lcpyE << std::endl << std::endl;
+    //    std::cout << "result: " << otherE.transpose() << std::endl;
 
     double test = (lcpyE.template triangularView<Eigen::Lower>() * otherE - cpyE).squaredNorm();
-    cout << "error solveTriangularForwardLeftLowerCol: " << test << endl;
+    std::cout << "error solveTriangularForwardLeftLowerCol: " << test << std::endl;
     SAIGA_ASSERT(test < 1e-10);
 #endif
 }
@@ -126,7 +126,7 @@ void solveTriangularBackwardsLeftLowerCol(const Lhs& lhs, const LhsDiag& lhsDiag
     }
 
 #if 0
-    cout << cpy.rows() << "x" << cpy.cols() << endl;
+    std::cout << cpy.rows() << "x" << cpy.cols() << std::endl;
     // Test if (Ax-b)==0
     auto lcpy       = lhs.toDense().eval();
     lcpy.diagonal() = lhsDiag;
@@ -139,11 +139,11 @@ void solveTriangularBackwardsLeftLowerCol(const Lhs& lhs, const LhsDiag& lhsDiag
     auto cpyE   = expand(cpy);
 
 
-    //    cout << lcpyE << endl << endl;
-    //    cout << "result: " << otherE.transpose() << endl;
+    //    std::cout << lcpyE << std::endl << std::endl;
+    //    std::cout << "result: " << otherE.transpose() << std::endl;
 
     double test = (lcpyE.template triangularView<Eigen::Lower>().transpose() * otherE - cpyE).squaredNorm();
-    cout << "error solveTriangularBackwardsLeftLowerCol: " << test << endl;
+    std::cout << "error solveTriangularBackwardsLeftLowerCol: " << test << std::endl;
     SAIGA_ASSERT(test < 1e-10);
 #endif
 }
@@ -298,7 +298,7 @@ class RecursiveSimplicialCholesky3Base2 : public SparseSolverBase<Derived>
             dest = m_P * b;
         else
             dest = b;
-        //        cout << "solve impl" << endl;
+        //        std::cout << "solve impl" << std::endl;
 
         //        if (m_matrix.nonZeros() > 0)
         {
@@ -307,7 +307,7 @@ class RecursiveSimplicialCholesky3Base2 : public SparseSolverBase<Derived>
         }
 
 
-        //        cout << "solve L dest: " << expand(dest).transpose() << endl;
+        //        std::cout << "solve L dest: " << expand(dest).transpose() << std::endl;
 
         //        multDiagVector2(m_diag_inv.asDiagonal(), dest);
 
@@ -316,7 +316,7 @@ class RecursiveSimplicialCholesky3Base2 : public SparseSolverBase<Derived>
             dest(k).get() = m_diag_inv[k] * dest(k).get();
         }
 
-        //        cout << "solve diag inv: " << expand(dest).transpose() << endl;
+        //        std::cout << "solve diag inv: " << expand(dest).transpose() << std::endl;
 
         //        if (m_matrix.nonZeros() > 0)  // otherwise U==I
         {
@@ -324,11 +324,11 @@ class RecursiveSimplicialCholesky3Base2 : public SparseSolverBase<Derived>
             //            derived().matrixU().solveInPlace(dest);
         }
 
-        //        cout << "solve L2 dest: " << expand(dest).transpose() << endl;
+        //        std::cout << "solve L2 dest: " << expand(dest).transpose() << std::endl;
 
-//        cout << "x2: " << expand(dest).transpose() << endl;
+//        std::cout << "x2: " << expand(dest).transpose() << std::endl;
 
-//        cout << "solve done" << endl;
+//        std::cout << "solve done" << std::endl;
 #    endif
 
 #    if 0
@@ -360,32 +360,32 @@ class RecursiveSimplicialCholesky3Base2 : public SparseSolverBase<Derived>
 
         Eigen::Matrix<double, -1, -1> x = expand(dest);
 
-        cout << L << endl << endl;
-        //        cout << dinv.transpose() << endl;
-        //        cout << x.transpose() << endl;
-        //        cout << endl;
+        std::cout << L << std::endl << std::endl;
+        //        std::cout << dinv.transpose() << std::endl;
+        //        std::cout << x.transpose() << std::endl;
+        //        std::cout << std::endl;
         L.template triangularView<Eigen::Lower>().solveInPlace(x);
 
-        cout << "solve L dest: " << x.transpose() << endl;
+        std::cout << "solve L dest: " << x.transpose() << std::endl;
 
         x.array() = dinv.array() * x.array();
 
-        cout << "solve diag inv: " << x.transpose() << endl;
+        std::cout << "solve diag inv: " << x.transpose() << std::endl;
 
         L.template triangularView<Eigen::Lower>().transpose().solveInPlace(x);
 
-        cout << "solve L2 dest: " << x.transpose() << endl;
+        std::cout << "solve L2 dest: " << x.transpose() << std::endl;
 
         dest.setZero();
         for (int i = 0; i < dest.rows(); ++i)
         {
             //            dest[i].get() = x.block(i * 2, 1, 2, 1);
             dest[i].get() = x.block<block_size, 1>(i * block_size, 0);
-            //            cout << i << endl << dest[i].get() << endl;
+            //            std::cout << i << std::endl << dest[i].get() << std::endl;
         }
 
-        //        cout << "x1: " << x.transpose() << endl;
-        //        cout << "x2: " << expand(dest).transpose() << endl;
+        //        std::cout << "x1: " << x.transpose() << std::endl;
+        //        std::cout << "x2: " << expand(dest).transpose() << std::endl;
 
 //        exit(0);
 #    endif
@@ -793,7 +793,7 @@ void RecursiveSimplicialCholesky3Base2<Derived>::ordering(const MatrixType& a, C
         if (m_Pinv.size() > 0)
         {
             // The ordering is already set use it!
-            //            cout << "Using preset permutation!" << endl;
+            //            std::cout << "Using preset permutation!" << std::endl;
             m_P = m_Pinv.inverse();
         }
         else

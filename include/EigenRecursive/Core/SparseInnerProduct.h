@@ -140,7 +140,7 @@ EIGEN_ALWAYS_INLINE Vec multDiagVector(const Diag& D, const Vec& v)
 template <typename Diag, typename Vec>
 EIGEN_ALWAYS_INLINE void multDiagVector2(const Diag& D, Vec& v)
 {
-    //    cout << D.rows() << " " << D.cols() << " " << D.size() << endl;
+    //    std::cout << D.rows() << " " << D.cols() << " " << D.size() << std::endl;
     eigen_assert(D.cols() == v.rows());
     for (int k = 0; k < D.rows(); ++k)
     {

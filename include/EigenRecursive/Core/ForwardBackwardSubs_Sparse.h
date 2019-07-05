@@ -38,7 +38,7 @@ VectorType forwardSubstituteDiagOne2(const MatrixType& A, const VectorType& b)
 #if 0
     // Test if (Ax-b)==0
     double test = (expand(A.toDense()) * expand(x) - expand(b)).squaredNorm();
-    cout << "error forwardSubstituteDiagOne: " << test << endl;
+    std::cout << "error forwardSubstituteDiagOne: " << test << std::endl;
 #endif
     return x;
 }
@@ -76,11 +76,11 @@ VectorType backwardSubstituteDiagOneTranspose2(const MatrixType& A, const Vector
 #if 0
     // Test if (Ax-b)==0
     double test = (expand(A.toDense()).transpose() * expand(x) - expand(b)).squaredNorm();
-    //    cout << A.transpose() << endl << endl;
-    //    cout << x << endl << endl;
-    //    cout << b << endl << endl;
+    //    std::cout << A.transpose() << std::endl << std::endl;
+    //    std::cout << x << std::endl << std::endl;
+    //    std::cout << b << std::endl << std::endl;
 
-    cout << "error backwardSubstituteDiagOneTranspose2: " << test << endl;
+    std::cout << "error backwardSubstituteDiagOneTranspose2: " << test << std::endl;
 #endif
     return x;
 }

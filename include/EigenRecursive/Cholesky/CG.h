@@ -167,10 +167,10 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient(const MultFunction& applyA, 
     Index n = rhs.rows();
 
 #ifdef RM_CG_DEBUG_OUTPUT
-    cout << "Starting recursive CG" << endl;
-    cout << "Iterations: " << iters << endl;
-    cout << "Tolerance: " << tol_error << endl;
-    cout << "N: " << n << endl;
+    std::cout << "Starting recursive CG" << std::endl;
+    std::cout << "Iterations: " << iters << std::endl;
+    std::cout << "Tolerance: " << tol_error << std::endl;
+    std::cout << "N: " << n << std::endl;
 #endif
 
 #if 0
@@ -205,7 +205,7 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient(const MultFunction& applyA, 
     RealScalar threshold     = tol * tol * rhsNorm2;
     RealScalar residualNorm2 = squaredNorm(residual);
 #ifdef RM_CG_DEBUG_OUTPUT
-    cout << "Initial residual: " << residualNorm2 << endl;
+    std::cout << "Initial residual: " << residualNorm2 << std::endl;
 #endif
     if (residualNorm2 < threshold)
     {
@@ -218,13 +218,13 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient(const MultFunction& applyA, 
     // the square of the absolute value of r scaled by invM
     RealScalar absNew = dot(residual, p);
 #ifdef RM_CG_DEBUG_OUTPUT
-    cout << "dot(r,p): " << absNew << endl;
+    std::cout << "dot(r,p): " << absNew << std::endl;
 #endif
 
     Index i = 0;
     while (i < maxIters)
     {
-        //        cout << "CG Residual " << i << ": " << residualNorm2 << endl;
+        //        std::cout << "CG Residual " << i << ": " << residualNorm2 << std::endl;
         z = applyA(p);
 
         // the amount we travel on dir
@@ -236,17 +236,17 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient(const MultFunction& applyA, 
 
         residualNorm2 = squaredNorm(residual);
 #ifdef RM_CG_DEBUG_OUTPUT
-        cout << "Iteration: " << i << " Residual: " << residualNorm2 << " Alpha: " << alpha << endl;
+        std::cout << "Iteration: " << i << " Residual: " << residualNorm2 << " Alpha: " << alpha << std::endl;
 #endif
         if (residualNorm2 < threshold) break;
 
         z = precond.solve(residual);  // approximately solve for "A z = residual"
-                                      //        cout << expand(p).transpose() << endl;
+                                      //        std::cout << expand(p).transpose() << std::endl;
 
         RealScalar absOld = absNew;
         absNew            = dot(residual, z);  // update the absolute value of r
         RealScalar beta = absNew / absOld;  // calculate the Gram-Schmidt value used to create the new search direction
-                                            //        cout << "absnew " << absNew << " beta " << beta << endl;
+                                            //        std::cout << "absnew " << absNew << " beta " << beta << std::endl;
         p = z + scalarMult(p, beta);        // update search direction
 
 

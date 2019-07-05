@@ -168,7 +168,7 @@ void RecursiveSimplicialCholeskyBase<Derived>::factorize_preordered(const CholMa
         for (typename CholMatrixType::InnerIterator it(ap, k); it; ++it)
         {
             StorageIndex i = it.index();
-            //            cout << "idx: " << i << "<=" << k << endl;
+            //            std::cout << "idx: " << i << "<=" << k << std::endl;
             if (i <= k)
             {
                 /* scatter A(i,k) into Y (sum duplicates) */
@@ -181,15 +181,15 @@ void RecursiveSimplicialCholeskyBase<Derived>::factorize_preordered(const CholMa
                     pattern[len++] = i; /* L(k,i) is nonzero */
                     tags[i]        = k; /* mark i as visited */
                                         //                    if (i != it.index())
-                    //                    cout << "found additional non zero L: " << k << "," << i << endl;
+                    //                    std::cout << "found additional non zero L: " << k << "," << i << std::endl;
                 }
                 while (len > 0)
                 {
                     pattern[--top] = pattern[--len];
                 }
 
-                //                cout << "stack " << top << " is now " << pattern[top] << " for i " << i << " " <<
-                //                it.index() << endl;
+                //                std::cout << "stack " << top << " is now " << pattern[top] << " for i " << i << " " <<
+                //                it.index() << std::endl;
             }
         }
 
@@ -205,7 +205,7 @@ void RecursiveSimplicialCholeskyBase<Derived>::factorize_preordered(const CholMa
             Index p  = Lp[i];
 
 
-            //            cout << "Pattern " << k << "," << i << endl;
+            //            std::cout << "Pattern " << k << "," << i << std::endl;
             Scalar target = rowCache[i]; /* get and clear Y(i) */
             rowCache[i]   = Recursive::AdditiveNeutral<Scalar>::get();
 

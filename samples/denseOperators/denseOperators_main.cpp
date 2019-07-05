@@ -6,11 +6,13 @@
  * See LICENSE file for more information.
  */
 #include "EigenRecursive/All.h"
+#include "EigenRecursive/Core/DenseMM.h"
 
 
 
 using std::cout;
 using std::endl;
+
 
 
 namespace Eigen::Recursive
@@ -37,6 +39,11 @@ class DenseTest
     using LHSV    = Matrix<MatrixScalar<LHSVector>, n2, 1>;
     using Result1 = Matrix<MatrixScalar<ResultBlock1>, n2, n2>;
     using Result2 = Matrix<MatrixScalar<ResultBlock2>, m2, m2>;
+
+
+    using NestedDynamic = Matrix<MatrixScalar<Matrix<MatrixScalar<Matrix<double, 3, 3>>, 2, 2>>, -1, -1>;
+
+
 #else
     // Dynamic outer matrices
 //    using LHS     = Matrix<MatrixScalar<LHSBlock>, -1, -1>;
@@ -52,9 +59,9 @@ class DenseTest
 
     DenseTest()
     {
-        cout << "Running recursive dense matrix tests..." << endl;
-        cout << "Blocks: " << n << "x" << m << endl;
-        cout << "OuterSize: " << outer_n << "x" << outer_m << endl;
+        std::cout << "Running recursive dense matrix tests..." << std::endl;
+        std::cout << "Blocks: " << n << "x" << m << std::endl;
+        std::cout << "OuterSize: " << outer_n << "x" << outer_m << std::endl;
 
         L.resize(outer_n, outer_m);
         R.resize(outer_m, outer_n);
@@ -71,11 +78,21 @@ class DenseTest
         RV2 = expand(RV);
         LV2 = expand(LV);
 
+        nestedL.resize(2, 2);
+        nestedR.resize(2, 2);
+
+        setRandom(nestedL);
+        setRandom(nestedR);
+
+        nestedL2 = expand(nestedL);
+        nestedR2 = expand(nestedR);
+
         //        add();
         //        scalar();
         mult();
+        nested();
 
-        cout << "Done." << endl << endl;
+        std::cout << "Done." << std::endl << std::endl;
     }
 
     void add() const
@@ -97,7 +114,7 @@ class DenseTest
             tmp2 = tmp2 + L2 - L2 + L2;
 
             double error = (expand(tmp) - tmp2).squaredNorm();
-            cout << "Add - Error: " << error << endl;
+            std::cout << "Add - Error: " << error << std::endl;
         }
     }
 
@@ -116,7 +133,7 @@ class DenseTest
             tmp2 = 0.3 * tmp2 + 0.7 * tmp2;
 
             double error = (expand(tmp) - tmp2).squaredNorm();
-            cout << "Scalar - Error: " << error << endl;
+            std::cout << "Scalar - Error: " << error << std::endl;
         }
     }
 
@@ -134,31 +151,39 @@ class DenseTest
         ExpandedType resRV2        = R2 * -LV2;
         ExpandedType resExpr_easy2 = L2 * (R2 * LV2);
 
-        cout << "Mat-Vec 1 - Error: " << (expand(resLV) - resLV2).squaredNorm() << endl;
-        cout << "Mat-Vec 2 - Error: " << (expand(resRV) - resRV2).squaredNorm() << endl;
-        cout << "Expression - Error: " << (expand(resExpr_easy) - resExpr_easy2).squaredNorm() << endl;
+        std::cout << "Mat-Vec 1 - Error: " << (expand(resLV) - resLV2).squaredNorm() << std::endl;
+        std::cout << "Mat-Vec 2 - Error: " << (expand(resRV) - resRV2).squaredNorm() << std::endl;
+        std::cout << "Expression - Error: " << (expand(resExpr_easy) - resExpr_easy2).squaredNorm() << std::endl;
 
 
-        // Dynamic Matrix-Matrix multiplication currently does not work
+        // Matrix - Matrix
+        Result1 resLR = L * R;
+        Result2 resRL = R * L;
+
+        ExpandedType resLR2 = L2 * R2;
+        ExpandedType resRL2 = R2 * L2;
+
+        std::cout << "Mat-Mat 1 - Error: " << (expand(resLR) - resLR2).squaredNorm() << std::endl;
+        std::cout << "Mat-Mat 2 - Error: " << (expand(resRL) - resRL2).squaredNorm() << std::endl;
+
         if constexpr (fixedSize)
         {
-            Result1 resLR = L * R;
-            Result2 resRL = R * L;
+            // Complex expressions currently don't work with dynamic matrices
+            RHSV resExpr_hard          = R * ((L * R) * LV);
+            ExpandedType resExpr_hard2 = R2 * ((L2 * R2) * LV2);
 
-            // Complex expression
-            RHSV resExpr_hard = R * ((L * R) * LV);
+            std::cout << "Expression - Error: " << (expand(resExpr_hard) - resExpr_hard2).squaredNorm() << std::endl;
+        }
+    }
 
-            {
-                // ==== Correctness check
-                ExpandedType resLR2 = L2 * R2;
-                ExpandedType resRL2 = R2 * L2;
+    void nested()
+    {
+        NestedDynamic res = nestedL * nestedR;
+        {
+            ExpandedType res2 = nestedL2 * nestedR2;
 
-                ExpandedType resExpr_hard2 = R2 * ((L2 * R2) * LV2);
-
-                cout << "Mat-Mat 1 - Error: " << (expand(resLR) - resLR2).squaredNorm() << endl;
-                cout << "Mat-Mat 2 - Error: " << (expand(resRL) - resRL2).squaredNorm() << endl;
-                cout << "Expression - Error: " << (expand(resExpr_hard) - resExpr_hard2).squaredNorm() << endl;
-            }
+            std::cout << "Nested Mat-Mat 1 - Error: " << (expand(res) - res2).squaredNorm() << std::endl;
+            //            std::cout << expand(res) << std::endl << std::endl << res2 << std::endl;
         }
     }
 
@@ -167,11 +192,13 @@ class DenseTest
     RHS R;
     RHSV RV;
     LHSV LV;
+    NestedDynamic nestedL, nestedR;
 
     ExpandedType L2;
     ExpandedType R2;
     ExpandedType RV2;
     ExpandedType LV2;
+    ExpandedType nestedL2, nestedR2;
 };
 
 }  // namespace Eigen::Recursive

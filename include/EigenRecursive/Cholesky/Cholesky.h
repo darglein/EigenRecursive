@@ -93,11 +93,11 @@ void DenseLDLT<MatrixType>::compute(const MatrixType& A)
                                      expand(L).template triangularView<Eigen::Lower>().transpose() -
                                  expand(A))
                                     .norm();
-    cout << "dense LDLT factorizationError " << factorizationError << endl;
+    std::cout << "dense LDLT factorizationError " << factorizationError << std::endl;
     eigen_assert(factorizationError < 1e-10);
 #endif
-    //    cout << expand(Dinv) << endl << endl;
-    //    cout << expand(L) << endl << endl;
+    //    std::cout << expand(Dinv) << std::endl << std::endl;
+    //    std::cout << expand(L) << std::endl << std::endl;
 }
 
 

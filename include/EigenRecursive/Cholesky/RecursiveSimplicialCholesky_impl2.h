@@ -193,8 +193,8 @@ void RecursiveSimplicialCholesky3Base2<Derived>::factorize_preordered(const Chol
     StorageIndex* Li        = m_matrix.innerIndexPtr();
     Scalar* Lx              = m_matrix.valuePtr();
 
-    //    cout << "factorize" << endl;
-    //    cout << expand(ap) << endl << endl;
+    //    std::cout << "factorize" << std::endl;
+    //    std::cout << expand(ap) << std::endl << std::endl;
 #if 0
     // doesn't make a difference
     ei_declare_aligned_stack_constructed_variable(Scalar, rowCache, size, 0);

@@ -584,7 +584,7 @@ void RecursiveSimplicialCholeskyBase<Derived>::ordering(const MatrixType& a, Con
         if (m_Pinv.size() > 0)
         {
             // The ordering is already set use it!
-            //            cout << "Using preset permutation!" << endl;
+            //            std::cout << "Using preset permutation!" << std::endl;
             m_P = m_Pinv.inverse();
         }
         else

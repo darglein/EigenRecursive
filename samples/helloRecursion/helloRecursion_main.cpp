@@ -5,7 +5,9 @@
  * Licensed under the MIT License.
  * See LICENSE file for more information.
  */
-#include "EigenRecursive/All.h"
+
+#if 0
+#    include "EigenRecursive/All.h"
 
 int main(int, char**)
 {
@@ -33,3 +35,15 @@ int main(int, char**)
     std::cout << "Error to non-recursive implementation: " << error << std::endl;
     return 0;
 }
+#else
+#    include <Eigen/Core>
+#    include <Eigen/Geometry>
+#    include <iostream>
+int main(int, char**)
+{
+    Eigen::Matrix<double, 2, 2> A;
+    std::cout << "hello" << A << std::endl;
+    return 0;
+}
+
+#endif

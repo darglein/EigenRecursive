@@ -204,7 +204,7 @@ struct Assignment<
     static void run(SparseSelfAdjointView<DestType, DestMode>& dst, const SrcXprType& src,
                     const internal::assign_op<Scalar, typename MatrixType::Scalar>&)
     {
-        //        cout << "permute row" << endl;
+        //        std::cout << "permute row" << std::endl;
         internal::permute_symm_to_symm_recursive<Mode, DestMode>(src.matrix(), dst.matrix(),
                                                                  src.perm().indices().data());
     }

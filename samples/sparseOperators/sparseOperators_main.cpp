@@ -40,9 +40,9 @@ class SparseTest
 
     SparseTest()
     {
-        cout << "Running recursive sparse matrix tests..." << endl;
-        cout << "Blocks: " << n << "x" << m << endl;
-        cout << "OuterSize: " << outer_n << "x" << outer_m << endl;
+        std::cout << "Running recursive sparse matrix tests..." << std::endl;
+        std::cout << "Blocks: " << n << "x" << m << std::endl;
+        std::cout << "OuterSize: " << outer_n << "x" << outer_m << std::endl;
 
         L.resize(outer_n, outer_m);
         R.resize(outer_m, outer_n);
@@ -63,7 +63,7 @@ class SparseTest
         scalar();
         mult();
 
-        cout << "Done." << endl << endl;
+        std::cout << "Done." << std::endl << std::endl;
     }
 
     void add() const
@@ -85,7 +85,7 @@ class SparseTest
             tmp2 = tmp2 + L2 - L2 + L2;
 
             double error = (expand(tmp) - tmp2).squaredNorm();
-            cout << "Add - Error: " << error << endl;
+            std::cout << "Add - Error: " << error << std::endl;
         }
     }
 
@@ -104,7 +104,7 @@ class SparseTest
             tmp2 = 0.3 * tmp2 + 0.7 * tmp2;
 
             double error = (expand(tmp) - tmp2).squaredNorm();
-            cout << "Scalar - Error: " << error << endl;
+            std::cout << "Scalar - Error: " << error << std::endl;
         }
     }
 
@@ -133,12 +133,12 @@ class SparseTest
             ExpandedType resExpr_easy2 = L2 * (R2 * LV2);
             ExpandedType resExpr_hard2 = R2 * ((L2 * R2) * LV2);
 
-            cout << "Mat-Mat 1 - Error: " << (expand(resLR) - resLR2).squaredNorm() << endl;
-            cout << "Mat-Mat 2 - Error: " << (expand(resRL) - resRL2).squaredNorm() << endl;
-            cout << "Mat-Vec 1 - Error: " << (expand(resLV) - resLV2).squaredNorm() << endl;
-            cout << "Mat-Vec 2 - Error: " << (expand(resRV) - resRV2).squaredNorm() << endl;
-            cout << "Expression - Error: " << (expand(resExpr_easy) - resExpr_easy2).squaredNorm() << endl;
-            cout << "Expression - Error: " << (expand(resExpr_hard) - resExpr_hard2).squaredNorm() << endl;
+            std::cout << "Mat-Mat 1 - Error: " << (expand(resLR) - resLR2).squaredNorm() << std::endl;
+            std::cout << "Mat-Mat 2 - Error: " << (expand(resRL) - resRL2).squaredNorm() << std::endl;
+            std::cout << "Mat-Vec 1 - Error: " << (expand(resLV) - resLV2).squaredNorm() << std::endl;
+            std::cout << "Mat-Vec 2 - Error: " << (expand(resRV) - resRV2).squaredNorm() << std::endl;
+            std::cout << "Expression - Error: " << (expand(resExpr_easy) - resExpr_easy2).squaredNorm() << std::endl;
+            std::cout << "Expression - Error: " << (expand(resExpr_hard) - resExpr_hard2).squaredNorm() << std::endl;
         }
     }
 

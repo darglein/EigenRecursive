@@ -39,7 +39,7 @@ VectorType forwardSubstituteDiagOne(const MatrixType& A, const VectorType& b)
 #if 0
     // Test if (Ax-b)==0
     double test = (expand(A).template triangularView<Lower>() * expand(x) - expand(b)).squaredNorm();
-    cout << "error forwardSubstituteDiagOne: " << test << endl;
+    std::cout << "error forwardSubstituteDiagOne: " << test << std::endl;
     SAIGA_ASSERT(test < 1e-10);
 #endif
     return x;
@@ -74,7 +74,7 @@ MatrixType forwardSubstituteDiagOneMulti(const MatrixType& A, const MatrixType& 
 #if 0
     // Test if (Ax-b)==0
     double test = (expand(A).template triangularView<Lower>() * expand(x) - expand(b)).squaredNorm();
-    cout << "error forwardSubstituteDiagOneMulti: " << test << endl;
+    std::cout << "error forwardSubstituteDiagOneMulti: " << test << std::endl;
     SAIGA_ASSERT(test < 1e-10);
 #endif
     return x;
@@ -104,7 +104,7 @@ VectorType backwardSubstituteDiagOneTranspose(const MatrixType& A, const VectorT
 #if 0
     // Test if (Ax-b)==0
     double test = (expand(A).transpose().template triangularView<Upper>() * expand(x) - expand(b)).squaredNorm();
-    cout << "error backwardSubstituteDiagOneTranspose: " << test << endl;
+    std::cout << "error backwardSubstituteDiagOneTranspose: " << test << std::endl;
     SAIGA_ASSERT(test < 1e-10);
 #endif
     return x;
@@ -136,11 +136,11 @@ MatrixType backwardSubstituteDiagOneTransposeMulti(const MatrixType& A, const Ma
     }
 
 #if 0
-    cout << fixedBlockMatrixToMatrix(x) << endl << endl;
+    std::cout << fixedBlockMatrixToMatrix(x) << std::endl << std::endl;
     // Test if (Ax-b)==0
     double test = (fixedBlockMatrixToMatrix(A).transpose() * fixedBlockMatrixToMatrix(x) - fixedBlockMatrixToMatrix(b))
                       .squaredNorm();
-    cout << "error backwardSubstituteDiagOneTranspose: " << test << endl;
+    std::cout << "error backwardSubstituteDiagOneTranspose: " << test << std::endl;
 #endif
     return x;
 }

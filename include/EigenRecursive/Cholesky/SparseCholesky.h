@@ -76,8 +76,8 @@ void SparseRecursiveLDLT<MatrixType, VectorType>::compute(const MatrixType& A)
                     removeMatrixScalar(sum) += removeMatrixScalar(Li.value()) *
                                                removeMatrixScalar(D.diagonal()(Li.col())) *
                                                removeMatrixScalar(transpose(Lj.value()));
-                    //                    cout << "li" << endl << expand(Li.value()) << endl;
-                    //                    cout << "lj" << endl << expand(Lj.value()) << endl;
+                    //                    std::cout << "li" << std::endl << expand(Li.value()) << std::endl;
+                    //                    std::cout << "lj" << std::endl << expand(Lj.value()) << std::endl;
                     ++Li;
                     ++Lj;
                 }
@@ -92,19 +92,19 @@ void SparseRecursiveLDLT<MatrixType, VectorType>::compute(const MatrixType& A)
             }
             if (it.col() == j)
             {
-                //                cout << "itcol==j it " << endl << expand(it.value()) << endl;
-                //                cout << "itcol==j sum " << endl << expand(sum) << endl;
+                //                std::cout << "itcol==j it " << std::endl << expand(it.value()) << std::endl;
+                //                std::cout << "itcol==j sum " << std::endl << expand(sum) << std::endl;
                 sum = it.value() - sum;
                 ++it;
             }
             else
             {
-                //                cout << "itcol!=j sum " << endl << expand(sum) << endl;
+                //                std::cout << "itcol!=j sum " << std::endl << expand(sum) << std::endl;
                 sum = -sum;
             }
 
             sum = sum * Dinv.diagonal()(j);
-            //            cout << "test " << i << " " << j << endl << expand(sum) << endl << endl;
+            //            std::cout << "test " << i << " " << j << std::endl << expand(sum) << std::endl << std::endl;
             L.insert(k, j) = sum;
             removeMatrixScalar(sumd) +=
                 removeMatrixScalar(sum) * removeMatrixScalar(D.diagonal()(j)) * removeMatrixScalar(transpose(sum));
@@ -114,7 +114,7 @@ void SparseRecursiveLDLT<MatrixType, VectorType>::compute(const MatrixType& A)
         D.diagonal()(k)    = it.value() - sumd;
         Dinv.diagonal()(k) = inverseCholesky(D.diagonal()(k));
 
-        //        cout << "computed " << k << "ths diagonal element: " << endl << expand(D.diagonal()(k)) << endl;
+        //        std::cout << "computed " << k << "ths diagonal element: " << std::endl << expand(D.diagonal()(k)) << std::endl;
     }
 
 #if 0
@@ -123,11 +123,11 @@ void SparseRecursiveLDLT<MatrixType, VectorType>::compute(const MatrixType& A)
                                      expand(L).template triangularView<Eigen::Lower>().transpose() -
                                  expand(A))
                                     .norm();
-    cout << "sparse LDLT factorizationError " << factorizationError << endl;
+    std::cout << "sparse LDLT factorizationError " << factorizationError << std::endl;
     SAIGA_ASSERT(factorizationError < 1e-10);
 #endif
-    //    cout << expand(Dinv) << endl << endl;
-    //    cout << expand(L) << endl << endl;
+    //    std::cout << expand(Dinv) << std::endl << std::endl;
+    //    std::cout << expand(L) << std::endl << std::endl;
 }
 
 template <typename MatrixType, typename VectorType>
