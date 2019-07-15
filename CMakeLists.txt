@@ -11,10 +11,8 @@ include(helper_macros)
 ############# Build Options ###############
 
 message(STATUS "\nBuild Options")
-
-
-DefaultBuildType(RelWithDebInfo)
-
+DefaultBuildType(Release)
+message(STATUS "CXX Compiler: ${CMAKE_CXX_COMPILER_ID}")
 
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -42,6 +40,12 @@ find_package(Sophus QUIET)
 PackageHelperTarget(Sophus::Sophus SOPHUS_FOUND)
 
 
+find_package(MKL QUIET)
+if(MKL_FOUND)
+    add_definitions(-DSAIGA_USE_MKL)
+endif()
+PackageHelper(MKL "${MKL_FOUND}" "${MKL_INCLUDE_DIR}" "${MKL_LIBRARIES}")
+include_directories(${PACKAGE_INCLUDES})
 include_directories(include/)
 
 add_subdirectory(include/)

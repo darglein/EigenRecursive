@@ -22,6 +22,7 @@ macro(make_sample)
     add_executable(${PROG_NAME} ${PROG_SRC} )
 
     target_link_libraries(${PROG_NAME} ${LIB_NAME})
+    target_link_libraries(${PROG_NAME} ${LIBS})
     # We only need to link the saiga target
     #message(STATUS "${${_modules}}")
     #target_link_libraries(${PROG_NAME} ${${_modules}})

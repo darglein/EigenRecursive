@@ -52,7 +52,7 @@ void solveTriangularForwardLeftLowerCol(const Lhs& lhs, const LhsDiag& lhsDiag, 
             // it points now to the diagonal element
             LhsIterator it(lhs, i);
             while (it && it.index() < i) ++it;
-            SAIGA_ASSERT(!it || it.index() != i);
+            eigen_assert(!it || it.index() != i);
 
 
             //            if (it && it.index() == i)
@@ -86,7 +86,7 @@ void solveTriangularForwardLeftLowerCol(const Lhs& lhs, const LhsDiag& lhsDiag, 
 
     double test = (lcpyE.template triangularView<Eigen::Lower>() * otherE - cpyE).squaredNorm();
     std::cout << "error solveTriangularForwardLeftLowerCol: " << test << std::endl;
-    SAIGA_ASSERT(test < 1e-10);
+    eigen_assert(test < 1e-10);
 #endif
 }
 
@@ -109,7 +109,7 @@ void solveTriangularBackwardsLeftLowerCol(const Lhs& lhs, const LhsDiag& lhsDiag
             RScalar tmp = other.coeff(i, col);
             LhsIterator it(lhs, i);
             while (it && it.index() < i) ++it;
-            SAIGA_ASSERT(!it || it.index() != i);
+            eigen_assert(!it || it.index() != i);
 
             for (; it; ++it)
             {
@@ -144,7 +144,7 @@ void solveTriangularBackwardsLeftLowerCol(const Lhs& lhs, const LhsDiag& lhsDiag
 
     double test = (lcpyE.template triangularView<Eigen::Lower>().transpose() * otherE - cpyE).squaredNorm();
     std::cout << "error solveTriangularBackwardsLeftLowerCol: " << test << std::endl;
-    SAIGA_ASSERT(test < 1e-10);
+    eigen_assert(test < 1e-10);
 #endif
 }
 

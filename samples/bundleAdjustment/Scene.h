@@ -98,7 +98,7 @@ struct WorldPoint
             }
         }
         stereoreferences.resize(stereoreferences.size() - 1);
-        //        SAIGA_ASSERT(!isReferencedByStereoFrame(img));
+        //        eigen_assert(!isReferencedByStereoFrame(img));
     }
 
     // the valid flag is set and this point is referenced by at least one image

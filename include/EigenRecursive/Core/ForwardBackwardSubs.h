@@ -40,7 +40,7 @@ VectorType forwardSubstituteDiagOne(const MatrixType& A, const VectorType& b)
     // Test if (Ax-b)==0
     double test = (expand(A).template triangularView<Lower>() * expand(x) - expand(b)).squaredNorm();
     std::cout << "error forwardSubstituteDiagOne: " << test << std::endl;
-    SAIGA_ASSERT(test < 1e-10);
+    eigen_assert(test < 1e-10);
 #endif
     return x;
 }
@@ -75,7 +75,7 @@ MatrixType forwardSubstituteDiagOneMulti(const MatrixType& A, const MatrixType& 
     // Test if (Ax-b)==0
     double test = (expand(A).template triangularView<Lower>() * expand(x) - expand(b)).squaredNorm();
     std::cout << "error forwardSubstituteDiagOneMulti: " << test << std::endl;
-    SAIGA_ASSERT(test < 1e-10);
+    eigen_assert(test < 1e-10);
 #endif
     return x;
 }
@@ -105,7 +105,7 @@ VectorType backwardSubstituteDiagOneTranspose(const MatrixType& A, const VectorT
     // Test if (Ax-b)==0
     double test = (expand(A).transpose().template triangularView<Upper>() * expand(x) - expand(b)).squaredNorm();
     std::cout << "error backwardSubstituteDiagOneTranspose: " << test << std::endl;
-    SAIGA_ASSERT(test < 1e-10);
+    eigen_assert(test < 1e-10);
 #endif
     return x;
 }

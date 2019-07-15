@@ -61,8 +61,8 @@ VectorType backwardSubstituteDiagOneTranspose2(const MatrixType& A, const Vector
         Scalar value = b(i) - x(i);
         typename MatrixType::ReverseInnerIterator it(A, i);
 
-        SAIGA_ASSERT(it.col() == i);
-        //        SAIGA_ASSERT(it.value() == 1);
+        eigen_assert(it.col() == i);
+        //        eigen_assert(it.value() == 1);
         x(i) = value;
         --it;
 

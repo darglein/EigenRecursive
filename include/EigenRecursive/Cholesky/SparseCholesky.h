@@ -109,7 +109,7 @@ void SparseRecursiveLDLT<MatrixType, VectorType>::compute(const MatrixType& A)
             removeMatrixScalar(sumd) +=
                 removeMatrixScalar(sum) * removeMatrixScalar(D.diagonal()(j)) * removeMatrixScalar(transpose(sum));
         }
-        SAIGA_ASSERT(it.col() == k);
+        eigen_assert(it.col() == k);
         L.insert(k, k)     = MultiplicativeNeutral<MatrixScalar>::get();
         D.diagonal()(k)    = it.value() - sumd;
         Dinv.diagonal()(k) = inverseCholesky(D.diagonal()(k));
@@ -124,7 +124,7 @@ void SparseRecursiveLDLT<MatrixType, VectorType>::compute(const MatrixType& A)
                                  expand(A))
                                     .norm();
     std::cout << "sparse LDLT factorizationError " << factorizationError << std::endl;
-    SAIGA_ASSERT(factorizationError < 1e-10);
+    eigen_assert(factorizationError < 1e-10);
 #endif
     //    std::cout << expand(Dinv) << std::endl << std::endl;
     //    std::cout << expand(L) << std::endl << std::endl;
@@ -133,7 +133,7 @@ void SparseRecursiveLDLT<MatrixType, VectorType>::compute(const MatrixType& A)
 template <typename MatrixType, typename VectorType>
 VectorType SparseRecursiveLDLT<MatrixType, VectorType>::solve(const VectorType& b)
 {
-    SAIGA_ASSERT(L.rows() == b.rows());
+    eigen_assert(L.rows() == b.rows());
     VectorType x, y;
     x.resize(b.rows());
     y.resize(b.rows());
