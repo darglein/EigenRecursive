@@ -32,12 +32,25 @@ Features
              return 0;
         }
     
-## Optimization and Benchmarks
+## Samples and Benchmarks
 
-To build the bundle adjustment sample you need the [Sophus](https://github.com/strasdat/Sophus) library installed. The other optimization samples as well as the benchmarks are currently part of the [Saiga](https://github.com/darglein/saiga) library.
+Compile and run instructions:
 
- * [Bundle Adjustment (included here)](https://github.com/darglein/EigenRecursive/tree/master/samples/bundleAdjustment)
- * [Benchmark - Matrix-Matrix, Matrix-Vector - MKL](https://github.com/darglein/saiga/tree/master/samples/vision/mkl_test)
+        mkdir build
+        cd build
+        cmake ..
+        make -j8
+        ./helloRecursion
+
+Sparse Block benchmark:
+
+ * Install the MKL library and make sure it is found by cmake.
+ * Compile in Release mode. (I currently recommend to use the latest Clang compiler)
+ 
+ Bundle Adjustment:
+ * Install Sophus from source: [Link](https://github.com/strasdat/Sophus)
+
+Other examples (included in the [Saiga](https://github.com/darglein/saiga) library):
  * [Benchmark - LDLT - Cholmod](https://github.com/darglein/saiga/tree/master/samples/vision/sparse_ldlt)
  * [Pose Graph Optimization](https://github.com/darglein/saiga/blob/master/src/saiga/vision/pgo/PGORecursive.h)
   * [ARAP](https://github.com/darglein/saiga/blob/master/src/saiga/vision/arap/RecursiveArap.h)
