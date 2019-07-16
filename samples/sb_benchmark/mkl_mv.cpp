@@ -35,6 +35,6 @@ struct LauncherLoop<END, END, T, factor>
 
 void bench_mv()
 {
-    LauncherLoop<4, 8 + 1, double, 64> l;
+    LauncherLoop<4, 8 + 1, double, 64 * 2> l;
     l();
 }
