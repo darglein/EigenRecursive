@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "SparseHelper.h"
+#include <iostream>
 
 
 
@@ -117,7 +117,6 @@ struct Eigen::internal::sparse_time_dense_product_impl<
                     const typename Res::Scalar& alpha)
     {
         LhsEval lhsEval(lhs);
-
         Index n = lhs.outerSize();
 
 

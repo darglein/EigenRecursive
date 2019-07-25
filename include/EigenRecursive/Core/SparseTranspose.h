@@ -20,9 +20,10 @@
  */
 
 #pragma once
-
 #include "SparseHelper.h"
 #include "Transpose.h"
+
+#include <iostream>
 
 namespace Eigen::Recursive
 {
@@ -83,10 +84,13 @@ void transpose(const Eigen::SparseMatrix<G, options>& other, Eigen::SparseMatrix
 
 
 template <typename G, typename H, int options>
-void transposeStructureOnly(const Eigen::SparseMatrix<G, options>& other, Eigen::SparseMatrix<H, options>& dest)
+void transposeStructureOnly(const Eigen::SparseMatrix<G, options>& other, Eigen::SparseMatrix<H, options>& dest,
+                            std::vector<int>& transposeTargets)
 {
     static_assert(options == Eigen::RowMajor, "todo");
     using SparseMatrix = Eigen::SparseMatrix<G, Eigen::RowMajor>;
+
+
 
     using namespace Eigen;
     //        SparseMatrix dest(other.rows(),other.cols());
@@ -111,12 +115,17 @@ void transposeStructureOnly(const Eigen::SparseMatrix<G, options>& other, Eigen:
     dest.outerIndexPtr()[dest.outerSize()] = count;
     // alloc
     dest.reserve(count);
+    transposeTargets.resize(count);
     // pass 2
     for (Index j = 0; j < other.outerSize(); ++j)
     {
-        for (typename SparseMatrix::InnerIterator it(other, j); it; ++it)
+        int op = other.outerIndexPtr()[j];
+        int i  = 0;
+        for (typename SparseMatrix::InnerIterator it(other, j); it; ++it, ++i)
         {
+            int rel                   = op + i;
             Index pos                 = positions[it.index()]++;
+            transposeTargets[rel]     = pos;
             dest.innerIndexPtr()[pos] = j;
         }
     }
@@ -125,20 +134,26 @@ void transposeStructureOnly(const Eigen::SparseMatrix<G, options>& other, Eigen:
 
 
 template <typename G, typename H, int options>
-void transposeValueOnly(const Eigen::SparseMatrix<G, options>& other, Eigen::SparseMatrix<H, options>& dest)
+void transposeValueOnly(const Eigen::SparseMatrix<G, options>& other, Eigen::SparseMatrix<H, options>& dest,
+                        const std::vector<int>& transposeTargets)
 {
     static_assert(options == Eigen::RowMajor, "todo");
     using SparseMatrix = Eigen::SparseMatrix<G, Eigen::RowMajor>;
     using namespace Eigen;
 
-    std::vector<int> positions(dest.outerSize(), 0);
+    //    std::vector<int> positions(dest.outerSize(), 0);
 
-
+#pragma omp parallel for
     for (Index j = 0; j < other.outerSize(); ++j)
     {
-        for (typename SparseMatrix::InnerIterator it(other, j); it; ++it)
+        int op = other.outerIndexPtr()[j];
+        int i  = 0;
+        for (typename SparseMatrix::InnerIterator it(other, j); it; ++it, ++i)
         {
-            Index pos                  = dest.outerIndexPtr()[it.index()] + positions[it.index()]++;
+            int rel = op + i;
+            int pos = transposeTargets[rel];
+            //            Index pos = dest.outerIndexPtr()[it.index()] + positions[it.index()]++;
+
             dest.valuePtr()[pos].get() = transpose(it.value()).get();
         }
     }

@@ -22,8 +22,8 @@
 
 #pragma once
 #include "../Core.h"
+#include "../Core/ParallelHelper.h"
 #include "Cholesky.h"
-
 namespace Eigen::Recursive
 {
 template <typename _Scalar>
@@ -42,6 +42,7 @@ class RecursiveDiagonalPreconditioner
 
     RecursiveDiagonalPreconditioner() : m_isInitialized(false) {}
 
+    void resize(int N) { m_invdiag.resize(N); }
     template <typename MatType>
     explicit RecursiveDiagonalPreconditioner(const MatType& mat) : m_invdiag(mat.cols())
     {
@@ -81,8 +82,13 @@ class RecursiveDiagonalPreconditioner
     RecursiveDiagonalPreconditioner& factorize(const Eigen::DiagonalMatrix<T, -1>& mat)
     {
         auto N = mat.rows();
-        m_invdiag.resize(N);
+        if (m_invdiag.rows() != N)
+        {
+            std::terminate();
+            m_invdiag.resize(N);
+        }
 
+#pragma omp for
         for (int j = 0; j < N; ++j)
         {
             m_invdiag(j) = inverseCholesky(mat.diagonal()(j));
@@ -101,7 +107,12 @@ class RecursiveDiagonalPreconditioner
     template <typename Rhs, typename Dest>
     void _solve_impl(const Rhs& b, Dest& x) const
     {
-        x = m_invdiag.array() * b.array();
+        //        x = m_invdiag.array() * b.array();
+#pragma omp for
+        for (int i = 0; i < b.rows(); ++i)
+        {
+            x(i) = m_invdiag(i) * b(i);
+        }
     }
 
     template <typename Rhs>
@@ -192,7 +203,8 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient(const MultFunction& applyA, 
     RealScalar tol = tol_error;
     Index maxIters = iters;
 
-    residual = rhs - applyA(x);
+    applyA(x, residual);
+    residual = rhs - residual;
 
     RealScalar rhsNorm2 = squaredNorm(rhs);
     if (rhsNorm2 == 0)
@@ -225,7 +237,7 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient(const MultFunction& applyA, 
     while (i < maxIters)
     {
         //        std::cout << "CG Residual " << i << ": " << residualNorm2 << std::endl;
-        z = applyA(p);
+        applyA(p, z);
 
         // the amount we travel on dir
         Scalar alpha = absNew / dot(p, z);
@@ -255,5 +267,133 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient(const MultFunction& applyA, 
     tol_error = sqrt(residualNorm2 / rhsNorm2);
     iters     = i;
 }
+
+
+// Multi threaded implementation
+template <typename MultFunction, typename Rhs, typename Dest, typename Preconditioner, typename SuperScalar>
+EIGEN_DONT_INLINE void recursive_conjugate_gradient_OMP(const MultFunction& applyA, const Rhs& rhs, Dest& x,
+                                                        const Preconditioner& precond, Eigen::Index& iters,
+                                                        SuperScalar& tol_error)
+{
+    // Typedefs
+    using namespace Eigen;
+    using std::abs;
+    using std::sqrt;
+    typedef SuperScalar RealScalar;
+    typedef SuperScalar Scalar;
+    typedef Rhs VectorType;
+
+    // Temp Vector variables
+    Index n = rhs.rows();
+
+
+    // Use static variables so a repeated call with the same size doesn't allocate memory
+    static VectorType z;
+    static VectorType p;
+    static VectorType residual;
+    static std::vector<Scalar> tmpResults1, tmpResults;
+
+#pragma omp single
+    {
+        z.resize(n);
+        p.resize(n);
+        residual.resize(n);
+        tmpResults1.resize(omp_get_num_threads());
+        tmpResults.resize(omp_get_num_threads());
+    }
+
+    int tid        = omp_get_thread_num();
+    RealScalar tol = tol_error;
+    Index maxIters = iters;
+
+
+    applyA(x, residual);
+
+#pragma omp for
+    for (int i = 0; i < n; ++i)
+    {
+        residual(i) = rhs(i) - residual(i);
+    }
+
+    //    tmpResults[tid]     = squaredNorm_omp(rhs);
+    squaredNorm_omp_local(rhs, tmpResults[tid]);
+    RealScalar rhsNorm2 = accumulate(tmpResults);
+
+
+
+    if (rhsNorm2 == 0)
+    {
+//        x.setZero();
+#pragma omp for
+        for (int i = 0; i < n; ++i)
+        {
+            x(i).get().setZero();
+        }
+        iters     = 0;
+        tol_error = 0;
+        maxIters  = 0;
+    }
+
+
+    RealScalar threshold = tol * tol * rhsNorm2;
+
+    squaredNorm_omp_local(residual, tmpResults1[tid]);
+    RealScalar residualNorm2 = accumulate(tmpResults1);
+    //    RealScalar residualNorm2 = squaredNorm(residual);
+    if (residualNorm2 < threshold)
+    {
+        iters     = 0;
+        tol_error = sqrt(residualNorm2 / rhsNorm2);
+        maxIters  = 0;
+    }
+
+    p = precond.solve(residual);  // initial search direction
+
+    dot_omp_local(residual, p, tmpResults[tid]);
+    RealScalar absNew = accumulate(tmpResults);
+
+    Index i = 0;
+    while (i < maxIters)
+    {
+        //        std::cout << "CG Residual " << i << ": " << residualNorm2 << std::endl;
+        applyA(p, z);
+        dot_omp_local(p, z, tmpResults1[tid]);
+        Scalar dotpz = accumulate(tmpResults1);
+        Scalar alpha = absNew / dotpz;
+
+#pragma omp for
+        for (int i = 0; i < n; ++i)
+        {
+            // the amount we travel on dir
+            // update solution
+            x(i) += p(i) * alpha;
+            // update residual
+            residual(i) -= z(i) * alpha;
+        }
+
+        squaredNorm_omp_local(residual, tmpResults[tid]);
+        residualNorm2 = accumulate(tmpResults);
+
+        if (residualNorm2 < threshold) break;
+        z = precond.solve(residual);  // approximately solve for "A z = residual"
+
+        RealScalar absOld = absNew;
+        dot_omp_local(residual, z, tmpResults[tid]);
+        absNew          = accumulate(tmpResults);
+        RealScalar beta = absNew / absOld;  // calculate the Gram-Schmidt value used to create the new search direction
+                                            //        std::cout << "absnew " << absNew << " beta " << beta << std::endl;
+#pragma omp for
+        for (int i = 0; i < n; ++i)
+        {
+            p(i) = z(i) + p(i) * beta;  // update search direction
+        }
+
+        i++;
+    }
+
+
+    tol_error = sqrt(residualNorm2 / rhsNorm2);
+    iters     = i;
+}  // namespace Eigen::Recursive
 
 }  // namespace Eigen::Recursive

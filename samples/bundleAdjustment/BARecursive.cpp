@@ -348,7 +348,10 @@ void BARec::solveLinearSystem()
                               : LinearSolverOptions::SolverType::Iterative;
     loptions.buildExplizitSchur = explizitSchur;
 
-    solver.solve(A, delta_x, b, loptions);
+#pragma omp parallel num_threads(14)
+    {
+        solver.solve(A, delta_x, b, loptions);
+    }
 }
 
 double BARec::computeCost()

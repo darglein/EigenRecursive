@@ -39,6 +39,8 @@ PackageHelperTarget(Eigen3::Eigen EIGEN3_FOUND)
 find_package(Sophus QUIET)
 PackageHelperTarget(Sophus::Sophus SOPHUS_FOUND)
 
+find_package(OpenMP REQUIRED)
+PackageHelperTarget(OpenMP::OpenMP_CXX OPENMP_FOUND)
 
 find_package(MKL QUIET)
 if(MKL_FOUND)

@@ -37,6 +37,7 @@ EIGEN_ALWAYS_INLINE void diagInnerProductTransposed(const LHS& lhs, const RHS& r
     eigen_assert(lhs.cols() == rhsTransposed.cols());
     eigen_assert(res.rows() == lhs.rows());
 
+#pragma omp for
     for (int i = 0; i < lhs.rows(); ++i)
     {
         typename DiagType::Scalar value;
@@ -85,25 +86,31 @@ EIGEN_ALWAYS_INLINE void multSparseRowTransposedVector(const LHS& lhsTransposed,
 // D : Diagonal (dense) matrix
 // R : Result same format and sparsity pattern as M
 template <typename S, typename DiagType>
-EIGEN_ALWAYS_INLINE S multSparseDiag(const S& M, const DiagType& D)
+EIGEN_ALWAYS_INLINE void multSparseDiag(const S& M, const DiagType& D, S& result)
 {
     eigen_assert(M.cols() == D.rows());
 
-    S result(M.rows(), M.cols());
-    result.reserve(M.nonZeros());
-    result.markAsRValue();
+#pragma omp single
+    {
+        result.resize(M.rows(), M.cols());
+        result.reserve(M.nonZeros());
+    }
+
 
     // Copy the structure
+#pragma omp for nowait
     for (int k = 0; k < M.outerSize() + 1; ++k)
     {
         result.outerIndexPtr()[k] = M.outerIndexPtr()[k];
     }
+#pragma omp for
     for (int k = 0; k < M.nonZeros(); ++k)
     {
         result.innerIndexPtr()[k] = M.innerIndexPtr()[k];
     }
 
-    // Copmpute result
+// Copmpute result
+#pragma omp for
     for (int k = 0; k < M.outerSize(); ++k)
     {
         typename S::InnerIterator itM(M, k);
@@ -115,7 +122,7 @@ EIGEN_ALWAYS_INLINE S multSparseDiag(const S& M, const DiagType& D)
         }
     }
 
-    return result;
+    //    return result;
 }
 
 template <typename Diag, typename Vec>
@@ -134,6 +141,19 @@ EIGEN_ALWAYS_INLINE Vec multDiagVector(const Diag& D, const Vec& v)
 
     return result;
 }
+
+template <typename Diag, typename Vec>
+EIGEN_ALWAYS_INLINE void multDiagVector(const Diag& D, const Vec& v, Vec& result)
+{
+    eigen_assert(D.cols() == v.rows());
+
+#pragma omp for
+    for (int k = 0; k < D.rows(); ++k)
+    {
+        result(k) = D.diagonal()(k) * v(k);
+    }
+}
+
 
 
 // v = D * v

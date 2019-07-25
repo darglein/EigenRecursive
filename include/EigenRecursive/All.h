@@ -10,5 +10,5 @@
 
 
 #include "Cholesky.h"
-#include "Core.h" 
+#include "Core.h"
 #include "Mixed.h"

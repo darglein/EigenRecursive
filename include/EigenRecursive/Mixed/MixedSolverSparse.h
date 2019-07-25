@@ -138,11 +138,8 @@ class MixedSymmetricRecursiveSolver<Eigen::SparseMatrix<Eigen::Recursive::Matrix
 
             XType tmp(n);
             recursive_conjugate_gradient(
-                [&](const XType& v) {
-                    tmp = A.template selfadjointView<Eigen::Upper>() * v;
-                    return tmp;
-                },
-                b, x, P, iters, tol);
+                [&](const XType& v, XType& result) { result = A.template selfadjointView<Eigen::Upper>() * v; }, b, x,
+                P, iters, tol);
         }
     }
 
