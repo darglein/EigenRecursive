@@ -90,6 +90,38 @@ EIGEN_ALWAYS_INLINE void multSparseDiag(const S& M, const DiagType& D, S& result
 {
     eigen_assert(M.cols() == D.rows());
 
+
+    result.resize(M.rows(), M.cols());
+    result.reserve(M.nonZeros());
+
+
+
+    for (int k = 0; k < M.outerSize() + 1; ++k)
+    {
+        result.outerIndexPtr()[k] = M.outerIndexPtr()[k];
+    }
+    for (int k = 0; k < M.nonZeros(); ++k)
+    {
+        result.innerIndexPtr()[k] = M.innerIndexPtr()[k];
+    }
+
+    // Copmpute result
+    for (int k = 0; k < M.outerSize(); ++k)
+    {
+        typename S::InnerIterator itM(M, k);
+        typename S::InnerIterator itRes(result, k);
+
+        for (; itM; ++itM, ++itRes)
+        {
+            itRes.valueRef() = itM.value() * D.diagonal()(itM.col());
+        }
+    }
+}
+template <typename S, typename DiagType>
+EIGEN_ALWAYS_INLINE void multSparseDiag_omp(const S& M, const DiagType& D, S& result)
+{
+    eigen_assert(M.cols() == D.rows());
+
 #pragma omp single
     {
         result.resize(M.rows(), M.cols());
@@ -121,8 +153,6 @@ EIGEN_ALWAYS_INLINE void multSparseDiag(const S& M, const DiagType& D, S& result
             itRes.valueRef() = itM.value() * D.diagonal()(itM.col());
         }
     }
-
-    //    return result;
 }
 
 template <typename Diag, typename Vec>

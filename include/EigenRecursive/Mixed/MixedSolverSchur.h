@@ -112,7 +112,7 @@ class MixedSymmetricRecursiveSolver<
 #if 1
         // U schur (S1)
         for (int i = 0; i < m; ++i) Vinv.diagonal()(i) = V.diagonal()(i).get().inverse();
-        Y = multSparseDiag(W, Vinv);
+        multSparseDiag(W, Vinv, Y);
 
         if (explizitSchur)
         {
@@ -138,10 +138,11 @@ class MixedSymmetricRecursiveSolver<
             Eigen::Index iters = solverOptions.maxIterativeIterations;
             double tol         = solverOptions.iterativeTolerance;
 
+            P.resize(n);
             P.compute(Sdiag);
             XUType tmp(n);
             recursive_conjugate_gradient(
-                [&](const XUType& v) {
+                [&](const XUType& v, XUType& result) {
                     // x = U * p - Y * WT * p
                     if (hasWT)
                     {
@@ -152,8 +153,7 @@ class MixedSymmetricRecursiveSolver<
                         multSparseRowTransposedVector(W, v, q);
                         tmp = Y * q;
                     }
-                    tmp = (U.diagonal().array() * v.array()) - tmp.array();
-                    return tmp;
+                    result = (U.diagonal().array() * v.array()) - tmp.array();
                 },
                 ej, da, P, iters, tol);
         }

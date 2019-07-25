@@ -11,6 +11,6 @@
 
 #include "Mixed/MixedMatrix.h"
 #include "Mixed/MixedSolver.h"
-//#include "Mixed/MixedSolverSchur.h"
-#include "Mixed/MixedSolverSchurMP.h"
+#include "Mixed/MixedSolverSchur.h"
+//#include "Mixed/MixedSolverSchurMP.h"
 #include "Mixed/MixedSolverSparse.h"
