@@ -37,6 +37,30 @@ EIGEN_ALWAYS_INLINE void diagInnerProductTransposed(const LHS& lhs, const RHS& r
     eigen_assert(lhs.cols() == rhsTransposed.cols());
     eigen_assert(res.rows() == lhs.rows());
 
+    for (int i = 0; i < lhs.rows(); ++i)
+    {
+        typename DiagType::Scalar value;
+        setZero(value);
+        typename LHS::InnerIterator lhsit(lhs, i);
+        typename RHS::InnerIterator rhsit(rhsTransposed, i);
+
+        for (; lhsit; ++lhsit, ++rhsit)
+        {
+            value.get() += lhsit.value().get() * transpose(rhsit.value().get());
+        }
+        res.diagonal()(i) = value;
+    }
+}
+
+
+template <typename LHS, typename RHS, typename DiagType>
+EIGEN_ALWAYS_INLINE void diagInnerProductTransposed_omp(const LHS& lhs, const RHS& rhsTransposed, DiagType& res)
+{
+    eigen_assert(lhs.IsRowMajor && rhsTransposed.IsRowMajor);
+    eigen_assert(lhs.rows() == rhsTransposed.rows());
+    eigen_assert(lhs.cols() == rhsTransposed.cols());
+    eigen_assert(res.rows() == lhs.rows());
+
 #pragma omp for
     for (int i = 0; i < lhs.rows(); ++i)
     {
@@ -173,7 +197,7 @@ EIGEN_ALWAYS_INLINE Vec multDiagVector(const Diag& D, const Vec& v)
 }
 
 template <typename Diag, typename Vec>
-EIGEN_ALWAYS_INLINE void multDiagVector(const Diag& D, const Vec& v, Vec& result)
+EIGEN_ALWAYS_INLINE void multDiagVector_omp(const Diag& D, const Vec& v, Vec& result)
 {
     eigen_assert(D.cols() == v.rows());
 

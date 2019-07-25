@@ -70,7 +70,7 @@ class MixedSymmetricRecursiveSolver<
 
             if (hasWT)
             {
-                transposeStructureOnly(A.w, WT,transposeTargets);
+                transposeStructureOnly_omp(A.w, WT,transposeTargets);
             }
 
             patternAnalyzed = true;
@@ -95,13 +95,13 @@ class MixedSymmetricRecursiveSolver<
         if (!patternAnalyzed) analyzePattern(A, solverOptions);
 
 
-        transposeValueOnly(A.w, WT,transposeTargets);
+        transposeValueOnly_omp(A.w, WT,transposeTargets);
         // U schur (S1)
 #pragma omp for
         for (int i = 0; i < m; ++i) Vinv.diagonal()(i) = V.diagonal()(i).get().inverse();
 
-        multSparseDiag(W,Vinv,Y);
-        diagInnerProductTransposed(Y, W, Sdiag);
+        multSparseDiag_omp(W,Vinv,Y);
+        diagInnerProductTransposed_omp(Y, W, Sdiag);
 
 #pragma omp for
         for (int i = 0; i < n; ++i) Sdiag.diagonal()(i).get() = U.diagonal()(i).get() - Sdiag.diagonal()(i).get();
@@ -152,7 +152,7 @@ class MixedSymmetricRecursiveSolver<
                 q(i).get() = eb(i).get() -q(i).get();
             }
         }
-        multDiagVector(Vinv,q,db);
+        multDiagVector_omp(Vinv,q,db);
 
     }
 

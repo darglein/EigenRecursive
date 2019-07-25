@@ -141,6 +141,8 @@ class MixedSymmetricRecursiveSolver<
             P.resize(n);
             P.compute(Sdiag);
             XUType tmp(n);
+
+#    if 1
             recursive_conjugate_gradient(
                 [&](const XUType& v, XUType& result) {
                     // x = U * p - Y * WT * p
@@ -156,6 +158,23 @@ class MixedSymmetricRecursiveSolver<
                     result = (U.diagonal().array() * v.array()) - tmp.array();
                 },
                 ej, da, P, iters, tol);
+#    else
+#        pragma omp parallel num_threads(14)
+            {
+                recursive_conjugate_gradient_OMP(
+                    [&](const XUType& v, XUType& result) {
+                        // x = U * p - Y * WT * p
+                        sparse_mv_omp(WT, v, q);
+                        sparse_mv_omp(Y, q, tmp);
+#        pragma omp for
+                        for (int i = 0; i < v.rows(); ++i)
+                        {
+                            result(i).get() = (U.diagonal()(i).get() * v(i).get()) - tmp(i).get();
+                        }
+                    },
+                    ej, da, P, iters, tol);
+            }
+#    endif
         }
         else
         {
