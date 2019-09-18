@@ -74,7 +74,7 @@ struct general_matrix_vector_product<Index, Recursive::MatrixScalar<LhsScalar2>,
     EIGEN_DEVICE_FUNC EIGEN_DONT_INLINE static void run(Index rows, Index cols, const LhsMapper& alhs,
                                                         const RhsMapper& rhs, ResScalar* res, Index resIncr, BS alpha)
     {
-        using LhsScalar = Recursive::MatrixScalar<LhsScalar2>;
+        // using LhsScalar = Recursive::MatrixScalar<LhsScalar2>;
         EIGEN_UNUSED_VARIABLE(resIncr);
         eigen_internal_assert(resIncr == 1);
 

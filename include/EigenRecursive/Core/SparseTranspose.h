@@ -117,11 +117,10 @@ void transposeStructureOnly(const Eigen::SparseMatrix<G, options>& other, Eigen:
     // pass 2
     for (Index j = 0; j < other.outerSize(); ++j)
     {
-        int op = other.outerIndexPtr()[j];
-        int i  = 0;
+        //        int op = other.outerIndexPtr()[j];
+        int i = 0;
         for (typename SparseMatrix::InnerIterator it(other, j); it; ++it, ++i)
         {
-            int rel                   = op + i;
             Index pos                 = positions[it.index()]++;
             dest.innerIndexPtr()[pos] = j;
         }

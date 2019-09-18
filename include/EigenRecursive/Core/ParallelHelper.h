@@ -28,33 +28,29 @@ namespace Eigen
 {
 namespace Recursive
 {
-
-
-
 template <typename T, typename T2>
 inline void squaredNorm_omp_local(const T& v, T2& result)
 {
-    using Scalar = typename BaseScalar<T>::type;
+    // using Scalar = typename BaseScalar<T>::type;
 
-    result =0;
+    result = 0;
 
 #pragma omp for
-    for(int i = 0; i < v.rows(); ++i)
+    for (int i = 0; i < v.rows(); ++i)
     {
         result += v(i).get().squaredNorm();
     }
-
 }
 
 template <typename T, typename T2>
 inline void dot_omp_local(const T& a, const T& b, T2& result)
 {
-    using Scalar = typename BaseScalar<T>::type;
+    // using Scalar = typename BaseScalar<T>::type;
 
-    result =0;
+    result = 0;
 
 #pragma omp for
-    for(int i = 0; i < a.rows(); ++i)
+    for (int i = 0; i < a.rows(); ++i)
     {
         result += a(i).get().dot(b(i).get());
     }
@@ -67,12 +63,12 @@ inline void sparse_mv_omp(const SparseLhsType& lhs, const DenseRhsType& rhs, Den
     typedef Eigen::internal::evaluator<Lhs> LhsEval;
     typedef typename Eigen::internal::evaluator<Lhs>::InnerIterator LhsInnerIterator;
 
-//#pragma omp single
+    //#pragma omp single
     {
-    LhsEval lhsEval(lhs);
-    Index n = lhs.outerSize();
+        LhsEval lhsEval(lhs);
+        Index n = lhs.outerSize();
 
-//        for (Index c = 0; c < rhs.cols(); ++c)
+        //        for (Index c = 0; c < rhs.cols(); ++c)
         {
 #pragma omp for
             for (Index i = 0; i < n; ++i)
@@ -85,11 +81,10 @@ inline void sparse_mv_omp(const SparseLhsType& lhs, const DenseRhsType& rhs, Den
                     res.coeffRef(i).get() += vlhs * vrhs;
                 }
             }
-
         }
     }
 }
 
 
-}  // namespace internal
+}  // namespace Recursive
 }  // namespace Eigen
