@@ -8,6 +8,8 @@ project (${LIB_NAME} CXX)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 include(helper_macros)
 
+OptionsHelper(BUILD_SAMPLES "" ON)
+
 ############# Build Options ###############
 
 message(STATUS "\nBuild Options")
@@ -51,7 +53,10 @@ include_directories(${PACKAGE_INCLUDES})
 include_directories(include/)
 
 add_subdirectory(include/)
-add_subdirectory(samples)
+
+if(BUILD_SAMPLES)
+    add_subdirectory(samples)
+endif()
 
 
 

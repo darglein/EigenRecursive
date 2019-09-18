@@ -59,9 +59,11 @@ class RecursiveDiagonalPreconditioner
     }
 
     // Sparse Matrix Initialization
-    template <typename MatType>
-    RecursiveDiagonalPreconditioner& factorize(const MatType& mat)
+    template <typename Scalar, int options>
+    //    RecursiveDiagonalPreconditioner& factorize(const MatType& mat)
+    RecursiveDiagonalPreconditioner& factorize(const SparseMatrix<Scalar, options>& mat)
     {
+        using MatType = SparseMatrix<Scalar, options>;
         m_invdiag.resize(mat.cols());
         for (int j = 0; j < mat.outerSize(); ++j)
         {
@@ -73,6 +75,19 @@ class RecursiveDiagonalPreconditioner
             else
                 //                m_invdiag(j) = Scalar(1);
                 removeMatrixScalar(m_invdiag(j)) = removeMatrixScalar(MultiplicativeNeutral<Scalar>::get());
+        }
+        m_isInitialized = true;
+        return *this;
+    }
+
+    // Dense Matrix Initialization
+    template <typename MatType>
+    RecursiveDiagonalPreconditioner& factorize(const MatType& mat)
+    {
+        m_invdiag.resize(mat.cols());
+        for (int j = 0; j < mat.outerSize(); ++j)
+        {
+            removeMatrixScalar(m_invdiag(j)) = removeMatrixScalar(inverseCholesky(mat(j, j)));
         }
         m_isInitialized = true;
         return *this;
@@ -128,8 +143,9 @@ class RecursiveDiagonalPreconditioner
 
     const auto& getDiagElement(int i) const { return m_invdiag(i); }
 
-   protected:
     Vector m_invdiag;
+
+   protected:
     bool m_isInitialized;
 };
 
@@ -269,6 +285,25 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient(const MultFunction& applyA, 
 }
 
 
+
+template <typename T>
+struct alignas(64) CacheAlignedValues
+{
+    T data;
+};
+
+template <typename T>
+inline double accumulate(const T& v)
+{
+    double d = 0;
+    for (auto& v : v)
+    {
+        d += v.data;
+    }
+    return d;
+}
+
+
 // Multi threaded implementation
 template <typename MultFunction, typename Rhs, typename Dest, typename Preconditioner, typename SuperScalar>
 EIGEN_DONT_INLINE void recursive_conjugate_gradient_OMP(const MultFunction& applyA, const Rhs& rhs, Dest& x,
@@ -291,7 +326,7 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient_OMP(const MultFunction& appl
     static VectorType z;
     static VectorType p;
     static VectorType residual;
-    static std::vector<Scalar> tmpResults1, tmpResults;
+    static std::vector<CacheAlignedValues<Scalar>> tmpResults1, tmpResults;
 
 #pragma omp single
     {
@@ -316,7 +351,7 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient_OMP(const MultFunction& appl
     }
 
     //    tmpResults[tid]     = squaredNorm_omp(rhs);
-    squaredNorm_omp_local(rhs, tmpResults[tid]);
+    squaredNorm_omp_local(rhs, tmpResults[tid].data);
     RealScalar rhsNorm2 = accumulate(tmpResults);
 
 
@@ -337,7 +372,7 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient_OMP(const MultFunction& appl
 
     RealScalar threshold = tol * tol * rhsNorm2;
 
-    squaredNorm_omp_local(residual, tmpResults1[tid]);
+    squaredNorm_omp_local(residual, tmpResults1[tid].data);
     RealScalar residualNorm2 = accumulate(tmpResults1);
     //    RealScalar residualNorm2 = squaredNorm(residual);
     if (residualNorm2 < threshold)
@@ -349,7 +384,7 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient_OMP(const MultFunction& appl
 
     p = precond.solve(residual);  // initial search direction
 
-    dot_omp_local(residual, p, tmpResults[tid]);
+    dot_omp_local(residual, p, tmpResults[tid].data);
     RealScalar absNew = accumulate(tmpResults);
 
     Index i = 0;
@@ -357,7 +392,7 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient_OMP(const MultFunction& appl
     {
         //        std::cout << "CG Residual " << i << ": " << residualNorm2 << std::endl;
         applyA(p, z);
-        dot_omp_local(p, z, tmpResults1[tid]);
+        dot_omp_local(p, z, tmpResults1[tid].data);
         Scalar dotpz = accumulate(tmpResults1);
         Scalar alpha = absNew / dotpz;
 
@@ -371,14 +406,14 @@ EIGEN_DONT_INLINE void recursive_conjugate_gradient_OMP(const MultFunction& appl
             residual(i) -= z(i) * alpha;
         }
 
-        squaredNorm_omp_local(residual, tmpResults[tid]);
+        squaredNorm_omp_local(residual, tmpResults[tid].data);
         residualNorm2 = accumulate(tmpResults);
 
         if (residualNorm2 < threshold) break;
         z = precond.solve(residual);  // approximately solve for "A z = residual"
 
         RealScalar absOld = absNew;
-        dot_omp_local(residual, z, tmpResults[tid]);
+        dot_omp_local(residual, z, tmpResults[tid].data);
         absNew          = accumulate(tmpResults);
         RealScalar beta = absNew / absOld;  // calculate the Gram-Schmidt value used to create the new search direction
                                             //        std::cout << "absnew " << absNew << " beta " << beta << std::endl;

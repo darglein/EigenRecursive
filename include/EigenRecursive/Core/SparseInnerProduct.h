@@ -238,3 +238,37 @@ EIGEN_ALWAYS_INLINE Vec multDiagVectorMulti(const Diag& D, const Vec& v)
 
     return result;
 }
+
+
+template <typename Mat, typename Vec>
+EIGEN_ALWAYS_INLINE void denseMV(const Mat& A, const Vec& v, Vec& result)
+{
+    eigen_assert(A.cols() == v.rows());
+    eigen_assert(A.IsRowMajor);
+
+    for (int k = 0; k < A.rows(); ++k)
+    {
+        result(k).get().setZero();
+        for (int j = 0; j < A.cols(); ++j)
+        {
+            result(k).get() += A(k, j).get() * v(j).get();
+        }
+    }
+}
+
+template <typename Mat, typename Vec>
+EIGEN_ALWAYS_INLINE void denseMV_omp(const Mat& A, const Vec& v, Vec& result)
+{
+    eigen_assert(A.cols() == v.rows());
+    eigen_assert(A.IsRowMajor);
+
+#pragma omp for
+    for (int k = 0; k < A.rows(); ++k)
+    {
+        result(k).get().setZero();
+        for (int j = 0; j < A.cols(); ++j)
+        {
+            result(k).get() += A(k, j).get() * v(j).get();
+        }
+    }
+}

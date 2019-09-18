@@ -13,4 +13,5 @@
 #include "Mixed/MixedSolver.h"
 #include "Mixed/MixedSolverSchur.h"
 //#include "Mixed/MixedSolverSchurMP.h"
+//#include "Mixed/MixedSolverSchurDense.h"
 #include "Mixed/MixedSolverSparse.h"

@@ -65,17 +65,16 @@ class MixedSymmetricRecursiveSolver<
             {
                 // TODO: add heurisitc here
                 hasWT         = true;
-                explizitSchur = false;
+                explizitSchur = true;
             }
 
             if (hasWT)
             {
-                transposeStructureOnly_omp(A.w, WT,transposeTargets);
+                transposeStructureOnly_omp(A.w, WT, transposeTargets);
             }
 
             patternAnalyzed = true;
         }
-
     }
 
 
@@ -95,24 +94,25 @@ class MixedSymmetricRecursiveSolver<
         if (!patternAnalyzed) analyzePattern(A, solverOptions);
 
 
-        transposeValueOnly_omp(A.w, WT,transposeTargets);
+        transposeValueOnly_omp(A.w, WT, transposeTargets);
         // U schur (S1)
 #pragma omp for
         for (int i = 0; i < m; ++i) Vinv.diagonal()(i) = V.diagonal()(i).get().inverse();
 
-        multSparseDiag_omp(W,Vinv,Y);
+
+        multSparseDiag_omp(W, Vinv, Y);
         diagInnerProductTransposed_omp(Y, W, Sdiag);
 
 #pragma omp for
         for (int i = 0; i < n; ++i) Sdiag.diagonal()(i).get() = U.diagonal()(i).get() - Sdiag.diagonal()(i).get();
 
 
-        sparse_mv_omp(Y,eb,ej);
+        sparse_mv_omp(Y, eb, ej);
 
 #pragma omp for
         for (int i = 0; i < n; ++i)
         {
-            ej(i).get() = ea(i).get() -ej(i).get();
+            ej(i).get() = ea(i).get() - ej(i).get();
             da(i).get().setZero();
         }
 
@@ -133,27 +133,27 @@ class MixedSymmetricRecursiveSolver<
         recursive_conjugate_gradient_OMP(
             [&](const XUType& v, XUType& result) {
                 // x = U * p - Y * WT * p
-                sparse_mv_omp(WT,v,q);
-                sparse_mv_omp(Y,q,tmp);
+                sparse_mv_omp(WT, v, q);
+                sparse_mv_omp(Y, q, tmp);
 #pragma omp for
-                for(int i =0 ; i < v.rows(); ++i){
+                for (int i = 0; i < v.rows(); ++i)
+                {
                     result(i).get() = (U.diagonal()(i).get() * v(i).get()) - tmp(i).get();
                 }
             },
             ej, da, P, iters, tol);
 
 
-        sparse_mv_omp(WT,da,q);
+        sparse_mv_omp(WT, da, q);
 
         {
 #pragma omp for
             for (int i = 0; i < m; ++i)
             {
-                q(i).get() = eb(i).get() -q(i).get();
+                q(i).get() = eb(i).get() - q(i).get();
             }
         }
-        multDiagVector_omp(Vinv,q,db);
-
+        multDiagVector_omp(Vinv, q, db);
     }
 
    private:

@@ -48,8 +48,8 @@ class MixedSymmetricRecursiveSolver<
     using XVType = typename XType::VType;
 
     static constexpr bool denseSchur = false;
-    //    using S1Type = Eigen::Matrix<UBlock, -1,-1,Eigen::RowMajor>;
-    using S1Type = Eigen::SparseMatrix<UBlock, Eigen::RowMajor>;
+//    using S1Type = Eigen::Matrix<UBlock, -1,-1,Eigen::RowMajor>;
+        using S1Type = Eigen::SparseMatrix<UBlock, Eigen::RowMajor>;
 
     //    using LDLT = Eigen::RecursiveSimplicialLDLT<S1Type, Eigen::Upper>;
 
@@ -77,11 +77,8 @@ class MixedSymmetricRecursiveSolver<
         else
         {
             // TODO: add heurisitc here
-            hasWT = true;
-            if (solverOptions.buildExplizitSchur)
-                explizitSchur = true;
-            else
-                explizitSchur = false;
+            hasWT         = true;
+            explizitSchur = true;
         }
 
         if (hasWT)
@@ -130,15 +127,14 @@ class MixedSymmetricRecursiveSolver<
 
             //            std::cout << expand(S1) << std::endl << std::endl;
             //            std::cout << expand(S2) << std::endl << std::endl;
+
+
         }
         else
         {
             diagInnerProductTransposed(Y, W, Sdiag);
             Sdiag.diagonal() = U.diagonal() - Sdiag.diagonal();
         }
-
-        //        std::cout << expand(Sdiag.toDenseMatrix()) << std::endl << std::endl;
-        //        exit(0);
         ej = ea + -(Y * eb);
         da.setZero();
 
@@ -156,14 +152,10 @@ class MixedSymmetricRecursiveSolver<
         if (explizitSchur)
         {
             P.compute(S1);
-            //            std::cout << expand(P.m_invdiag) << std::endl << std::endl;
-        }
-        else
-        {
+        }else{
             P.compute(Sdiag);
-            //            std::cout << expand(P.m_invdiag) << std::endl << std::endl;
-        }
 
+        }
         XUType tmp(n);
 
 
@@ -172,14 +164,11 @@ class MixedSymmetricRecursiveSolver<
                 // x = U * p - Y * WT * p
                 if (explizitSchur)
                 {
-                    //                    if constexpr (denseSchur)
-                    //                        denseMV(S1, v, result);
-                    //                    else
-                    result = S1.template selfadjointView<Eigen::Upper>() * v;
-                    //                    std::cout << expand(result) << std::endl << std::endl;
-                }
-                else
-                {
+                    if constexpr(denseSchur)
+                        denseMV(S1,v,result);
+                    else
+                        result = S1 * v;
+                }else{
                     if (hasWT)
                     {
                         tmp = Y * (WT * v);
@@ -190,7 +179,6 @@ class MixedSymmetricRecursiveSolver<
                         tmp = Y * q;
                     }
                     result = (U.diagonal().array() * v.array()) - tmp.array();
-                    //                    std::cout << expand(result) << std::endl << std::endl;
                 }
             },
             ej, da, P, iters, tol);

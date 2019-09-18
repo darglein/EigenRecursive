@@ -30,16 +30,6 @@ namespace Recursive
 {
 
 
-template <typename T>
-inline double accumulate(const T& v)
-{
-    double d = 0;
-    for (auto v : v)
-    {
-        d += v;
-    }
-    return d;
-}
 
 template <typename T, typename T2>
 inline void squaredNorm_omp_local(const T& v, T2& result)

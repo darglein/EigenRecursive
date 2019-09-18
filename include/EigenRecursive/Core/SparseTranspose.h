@@ -208,7 +208,7 @@ void transposeValueOnly_omp(const Eigen::SparseMatrix<G, options>& other, Eigen:
 
     //    std::vector<int> positions(dest.outerSize(), 0);
 
-#pragma omp parallel for
+#pragma omp for
     for (Index j = 0; j < other.outerSize(); ++j)
     {
         int op = other.outerIndexPtr()[j];
